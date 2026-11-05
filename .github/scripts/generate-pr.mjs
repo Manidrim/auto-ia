@@ -13,7 +13,7 @@ function gh(args) {
   }).trim();
 }
 
-const issue = JSON.parse(gh(`issue view ${issueNumber} --json title,body,labels`));
+const issue = JSON.parse(gh(`issue view ${issueNumber} --json title,body,labels,comments`));
 if (!issue.labels.some((l) => l.name === "validated")) {
   console.log("Issue non validée, arrêt.");
   process.exit(0);
@@ -51,6 +51,7 @@ const response = await chat([
       `Fichiers du projet :\n${repoFiles}\n\n` +
       `Contenus actuels :\n${JSON.stringify(fileContents)}\n\n` +
       `Issue à implémenter :\n# ${issue.title}\n\n${issue.body}\n\n` +
+      `Commentaires (précisions du product owner) :\n${issue.comments.map((c) => `${c.author.login} : ${c.body}`).join("\n")}\n\n` +
       "Implémente cette issue de façon minimale et propre. Rends uniquement le JSON.",
   },
 ]);

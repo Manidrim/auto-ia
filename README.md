@@ -7,9 +7,13 @@ Projet qui **s'auto-alimente** : l'IA propose, tu valides, l'IA code, la CI vér
 1. Une **issue** est créée (par l'IA après un merge, ou manuellement). Toujours petite, au format user story :
    > En tant que [élève], je veux [action], afin de [bénéfice].
 2. Tu valides en ajoutant le label **`validated`**.
-3. Le workflow [`auto-pr.yml`](.github/workflows/auto-pr.yml) appelle l'API Mistral, qui implémente l'issue et ouvre une **PR**.
-4. La **CI** ([`ci.yml`](.github/workflows/ci.yml)) fait tourner les tests vitest et le build Vite sur la PR.
-5. Tu merges la PR → le workflow [`next-issue.yml`](.github/workflows/next-issue.yml) demande à l'IA de créer la **prochaine issue**.
+3. Le workflow [`auto-pr.yml`](.github/workflows/auto-pr.yml) appelle l'API Mistral, qui implémente l'issue (corps + commentaires) et ouvre une **PR**.
+4. Tu testes la PR (preview Vercel) :
+   - **`/question`** + ta question → le workflow [`answer-pr.yml`](.github/workflows/answer-pr.yml) répond par commentaire, sans toucher au code
+   - **`/corrige`** + tes retours → le workflow [`fix-pr.yml`](.github/workflows/fix-pr.yml) applique les corrections sur la même PR
+5. La **CI** ([`ci.yml`](.github/workflows/ci.yml)) fait tourner les tests vitest et le build Vite sur la PR.
+6. Tu merges la PR → le workflow [`next-issue.yml`](.github/workflows/next-issue.yml) demande à l'IA de créer la **prochaine issue**.
+
 
 ## Le site
 
