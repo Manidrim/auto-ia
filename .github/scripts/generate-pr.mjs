@@ -20,7 +20,14 @@ if (!issue.labels.some((l) => l.name === "validated")) {
 }
 
 const branch = `auto/pr-issue-${issueNumber}`;
-execSync(`git checkout -b ${branch}`, { stdio: "inherit" });
+
+const existingPrs = JSON.parse(gh(`pr list --head ${branch} --state open --json number`));
+if (existingPrs.length > 0) {
+  console.log(`Une PR existe déjà pour l'issue #${issueNumber} (PR #${existingPrs[0].number}), arrêt.`);
+  process.exit(0);
+}
+
+execSync(`git checkout -B ${branch} origin/main`, { stdio: "inherit" });
 
 const repoFiles = execSync("git ls-files", { encoding: "utf8" })
   .trim()
@@ -63,7 +70,7 @@ for (const file of plan.files) {
 
 execSync("git add -A", { stdio: "inherit" });
 execSync(`git commit -m "feat: ${issue.title.replace(/"/g, "'")}"`, { stdio: "inherit" });
-execSync(`git push origin ${branch}`, { stdio: "inherit" });
+execSync(`git push origin ${branch} --force`, { stdio: "inherit" });
 
 const bodyFile = "/tmp/pr-body.md";
 writeFileSync(
