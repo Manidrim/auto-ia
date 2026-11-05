@@ -11,7 +11,6 @@ Projet qui **s'auto-alimente** : l'IA propose, tu valides, l'IA code, la CI vér
 4. Tu testes la PR (preview Vercel) et tu commentes **`/corrige`** avec tes retours → le workflow [`fix-pr.yml`](.github/workflows/fix-pr.yml) applique les corrections sur la même PR.
 5. La **CI** ([`ci.yml`](.github/workflows/ci.yml)) fait tourner les tests vitest et le build Vite sur la PR.
 6. Tu merges la PR → le workflow [`next-issue.yml`](.github/workflows/next-issue.yml) demande à l'IA de créer la **prochaine issue**.
-4. La **CI** ([`ci.yml`](.github/workflows/ci.yml)) fait tourner les tests vitest et le build Vite sur la PR.
 
 
 ## Le site
