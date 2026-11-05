@@ -1,11 +1,12 @@
 import { useState } from "react";
 import Quiz from "./components/Quiz";
-import { ADDITIONS, SOUSTRACTIONS, MULTIPLICATIONS, LEVELS } from "./lib/exercises";
+import { ADDITIONS, SOUSTRACTIONS, MULTIPLICATIONS, LEVELS, DIFFICULTY_LEVELS } from "./lib/exercises";
 
 const MODES = [ADDITIONS, SOUSTRACTIONS, MULTIPLICATIONS];
 
 export default function App() {
   const [mode, setMode] = useState(null);
+  const [difficulty, setDifficulty] = useState(null);
 
   if (mode === null) {
     return (
@@ -23,9 +24,26 @@ export default function App() {
     );
   }
 
+  if (difficulty === null) {
+    return (
+      <main className="menu">
+        <h1>🧮 Auto-Maths</h1>
+        <p>Choisis ton niveau de difficulté pour {LEVELS[mode].label}</p>
+        <ul>
+          {Object.values(DIFFICULTY_LEVELS).map((d) => (
+            <li key={d.label}>
+              <button onClick={() => setDifficulty(d)}>{d.label}</button>
+            </li>
+          ))}
+        </ul>
+        <button onClick={() => setMode(null)} style={{ marginTop: '1rem' }}>Retour</button>
+      </main>
+    );
+  }
+
   return (
     <main className="menu">
-      <Quiz mode={mode} onExit={() => setMode(null)} />
+      <Quiz mode={mode} difficulty={difficulty} onExit={() => setDifficulty(null)} />
     </main>
   );
 }

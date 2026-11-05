@@ -5,6 +5,7 @@ import {
   MULTIPLICATIONS,
   makeExercise,
   randomInt,
+  DIFFICULTY_LEVELS,
 } from "./exercises";
 
 describe("randomInt", () => {
@@ -39,5 +40,50 @@ describe("makeExercise", () => {
 
   it("rejette un mode inconnu", () => {
     expect(() => makeExercise("inconnu")).toThrow();
+  });
+
+  describe("niveaux de difficulté", () => {
+    it("facile limite les nombres à 1-10 pour additions", () => {
+      const ex = makeExercise(ADDITIONS, DIFFICULTY_LEVELS.EASY);
+      const [a, b] = ex.question.split(" + ").map(Number);
+      expect(a).toBeGreaterThanOrEqual(1);
+      expect(a).toBeLessThanOrEqual(10);
+      expect(b).toBeGreaterThanOrEqual(1);
+      expect(b).toBeLessThanOrEqual(10);
+    });
+
+    it("moyen limite les nombres à 1-50 pour additions", () => {
+      const ex = makeExercise(ADDITIONS, DIFFICULTY_LEVELS.MEDIUM);
+      const [a, b] = ex.question.split(" + ").map(Number);
+      expect(a).toBeGreaterThanOrEqual(1);
+      expect(a).toBeLessThanOrEqual(50);
+      expect(b).toBeGreaterThanOrEqual(1);
+      expect(b).toBeLessThanOrEqual(50);
+    });
+
+    it("difficile limite les nombres à 1-100 pour additions", () => {
+      const ex = makeExercise(ADDITIONS, DIFFICULTY_LEVELS.HARD);
+      const [a, b] = ex.question.split(" + ").map(Number);
+      expect(a).toBeGreaterThanOrEqual(1);
+      expect(a).toBeLessThanOrEqual(100);
+      expect(b).toBeGreaterThanOrEqual(1);
+      expect(b).toBeLessThanOrEqual(100);
+    });
+
+    it("respecte les limites de mode pour multiplications", () => {
+      const exEasy = makeExercise(MULTIPLICATIONS, DIFFICULTY_LEVELS.EASY);
+      const [aEasy, bEasy] = exEasy.question.split(" × ").map(Number);
+      expect(aEasy).toBeGreaterThanOrEqual(1);
+      expect(aEasy).toBeLessThanOrEqual(10);
+      expect(bEasy).toBeGreaterThanOrEqual(1);
+      expect(bEasy).toBeLessThanOrEqual(10);
+
+      const exHard = makeExercise(MULTIPLICATIONS, DIFFICULTY_LEVELS.HARD);
+      const [aHard, bHard] = exHard.question.split(" × ").map(Number);
+      expect(aHard).toBeGreaterThanOrEqual(1);
+      expect(aHard).toBeLessThanOrEqual(10);
+      expect(bHard).toBeGreaterThanOrEqual(1);
+      expect(bHard).toBeLessThanOrEqual(10);
+    });
   });
 });

@@ -3,12 +3,12 @@ import { makeExercise } from "../lib/exercises";
 
 const TOTAL = 10;
 
-export default function Quiz({ mode, onExit }) {
+export default function Quiz({ mode, difficulty, onExit }) {
   const [score, setScore] = useState(0);
   const [count, setCount] = useState(0);
   const [value, setValue] = useState("");
   const [feedback, setFeedback] = useState(null);
-  const exercise = useMemo(() => makeExercise(mode), [mode, count]);
+  const exercise = useMemo(() => makeExercise(mode, difficulty), [mode, difficulty, count]);
 
   useEffect(() => {
     setValue("");
