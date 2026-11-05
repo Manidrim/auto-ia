@@ -8,6 +8,7 @@ export default function Quiz({ mode, difficulty, onExit }) {
   const [count, setCount] = useState(0);
   const [value, setValue] = useState("");
   const [feedback, setFeedback] = useState(null);
+  const [answers, setAnswers] = useState([]);
   const exercise = useMemo(() => makeExercise(mode, difficulty), [mode, difficulty, count]);
 
   useEffect(() => {
@@ -21,6 +22,7 @@ export default function Quiz({ mode, difficulty, onExit }) {
     const ok = Number(value) === exercise.answer;
     setFeedback(ok);
     if (ok) setScore((s) => s + 1);
+    setAnswers((a) => [...a, ok]);
   }
 
   function next() {
@@ -38,6 +40,11 @@ export default function Quiz({ mode, difficulty, onExit }) {
         <p>
           Tu as {score} bonne{score > 1 ? "s" : ""} réponse{score > 1 ? "s" : ""} sur {TOTAL}.
         </p>
+        <div className="stars">
+          {answers.map((ok, i) => (
+            <span key={i} role="img" aria-label="étoile">{ok ? "⭐" : "❌"}</span>
+          ))}
+        </div>
         <button onClick={onExit}>Rejouer</button>
       </div>
     );
