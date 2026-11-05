@@ -1,0 +1,38 @@
+name: Corriger la PR à partir des retours (/corrige)
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: fix-pr-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  fix:
+    if: |
+      github.event.issue.pull_request &&
+      startsWith(github.event.comment.body, '/corrige')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Configurer l'identité git
+        run: |
+          git config user.name "auto-ia-bot"
+          git config user.email "actions@github.com"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Appliquer les retours avec l'IA
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+        run: node .github/scripts/fix-pr.mjs
