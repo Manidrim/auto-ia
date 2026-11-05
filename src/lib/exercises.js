@@ -1,11 +1,13 @@
 const ADDITIONS = "additions";
 const SOUSTRACTIONS = "soustractions";
 const MULTIPLICATIONS = "multiplications";
+const DIVISIONS = "divisions";
 
 const LEVELS = {
   [ADDITIONS]: { min: 1, max: 20, label: "Additions" },
   [SOUSTRACTIONS]: { min: 1, max: 20, label: "Soustractions" },
   [MULTIPLICATIONS]: { min: 1, max: 10, label: "Multiplications" },
+  [DIVISIONS]: { min: 1, max: 20, label: "Divisions" },
 };
 
 const DIFFICULTY_LEVELS = {
@@ -43,7 +45,13 @@ function makeExercise(mode, difficulty = DIFFICULTY_LEVELS.MEDIUM) {
     const b = randomInt(effectiveMin, effectiveMax);
     return { question: `${a} × ${b}`, answer: a * b };
   }
+  if (mode === DIVISIONS) {
+    const b = randomInt(effectiveMin, effectiveMax);
+    const result = randomInt(effectiveMin, effectiveMax);
+    const a = b * result;
+    return { question: `${a} ÷ ${b}`, answer: result };
+  }
   throw new Error(`Mode inconnu : ${mode}`);
 }
 
-export { ADDITIONS, SOUSTRACTIONS, MULTIPLICATIONS, LEVELS, DIFFICULTY_LEVELS, makeExercise, randomInt };
+export { ADDITIONS, SOUSTRACTIONS, MULTIPLICATIONS, DIVISIONS, LEVELS, DIFFICULTY_LEVELS, makeExercise, randomInt };
