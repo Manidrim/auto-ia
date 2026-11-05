@@ -9,11 +9,13 @@ export default function Quiz({ mode, difficulty, onExit }) {
   const [value, setValue] = useState("");
   const [feedback, setFeedback] = useState(null);
   const [answers, setAnswers] = useState([]);
+  const [showFeedback, setShowFeedback] = useState(false);
   const exercise = useMemo(() => makeExercise(mode, difficulty), [mode, difficulty, count]);
 
   useEffect(() => {
     setValue("");
     setFeedback(null);
+    setShowFeedback(false);
   }, [count]);
 
   function submit(e) {
@@ -21,8 +23,14 @@ export default function Quiz({ mode, difficulty, onExit }) {
     if (feedback !== null) return;
     const ok = Number(value) === exercise.answer;
     setFeedback(ok);
+    setShowFeedback(true);
     if (ok) setScore((s) => s + 1);
     setAnswers((a) => [...a, ok]);
+    
+    // Masquer le feedback après 1 seconde
+    setTimeout(() => {
+      setShowFeedback(false);
+    }, 1000);
   }
 
   function next() {
@@ -70,9 +78,9 @@ export default function Quiz({ mode, difficulty, onExit }) {
         </form>
       ) : (
         <div>
-          <p className={feedback ? "ok" : "ko"}>
+          <div className={`feedback ${showFeedback ? (feedback ? 'feedback-ok' : 'feedback-ko') : ''}`}>
             {feedback ? "✅ Bravo !" : `❌ La réponse était ${exercise.answer}`}
-          </p>
+          </div>
           <button onClick={next}>Question suivante</button>
         </div>
       )}

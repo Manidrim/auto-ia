@@ -88,3 +88,24 @@ input {
   font-size: 2rem;
   margin: 1rem 0;
 }
+
+.feedback {
+  font-size: 1.5rem;
+  font-weight: bold;
+  min-height: 2rem;
+  transition: background-color 0.3s ease;
+}
+
+.feedback-ok {
+  background-color: rgba(46, 125, 50, 0.1);
+  color: #2e7d32;
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+
+.feedback-ko {
+  background-color: rgba(198, 40, 40, 0.1);
+  color: #c62828;
+  padding: 0.5rem;
+  border-radius: 8px;
+}
