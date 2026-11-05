@@ -1,4 +1,5 @@
 import { execSync } from "node:child_process";
+import { writeFileSync } from "node:fs";
 import { chat } from "./mistral.js";
 
 const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
@@ -47,7 +48,9 @@ const answer = await chat([
   },
 ]);
 
-execSync(`gh pr comment ${prNumber} --repo ${owner}/${repo} --body ${JSON.stringify(answer)}`, {
+const bodyFile = "/tmp/answer.md";
+writeFileSync(bodyFile, answer);
+execSync(`gh pr comment ${prNumber} --repo ${owner}/${repo} --body-file ${bodyFile}`, {
   env: { ...process.env, GH_TOKEN: token },
   stdio: "inherit",
 });
