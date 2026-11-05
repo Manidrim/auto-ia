@@ -22,8 +22,8 @@ if (pr.state !== "OPEN") {
 }
 
 const comments = JSON.parse(
-  gh(`pr view ${prNumber} --comments --json comments`)
-).comments.map((c) => `${c.author.login} : ${c.body}`).join("\n");
+  gh(`api repos/${owner}/${repo}/issues/${prNumber}/comments --paginate`)
+).map((c) => `${c.user.login} : ${c.body}`).join("\n");
 
 const reviewComments = JSON.parse(
   gh(`api repos/${owner}/${repo}/pulls/${prNumber}/comments --paginate`)
