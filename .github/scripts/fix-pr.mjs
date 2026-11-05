@@ -13,6 +13,13 @@ function gh(args) {
   }).trim();
 }
 
+function ghApi(endpoint) {
+  return execSync(`gh api ${endpoint}`, {
+    env: { ...process.env, GH_TOKEN: token },
+    encoding: "utf8",
+  }).trim();
+}
+
 const pr = JSON.parse(
   gh(`pr view ${prNumber} --json title,body,headRefName,baseRefName,state`)
 );
@@ -22,11 +29,11 @@ if (pr.state !== "OPEN") {
 }
 
 const comments = JSON.parse(
-  gh(`api repos/${owner}/${repo}/issues/${prNumber}/comments --paginate`)
+  ghApi(`repos/${owner}/${repo}/issues/${prNumber}/comments --paginate`)
 ).map((c) => `${c.user.login} : ${c.body}`).join("\n");
 
 const reviewComments = JSON.parse(
-  gh(`api repos/${owner}/${repo}/pulls/${prNumber}/comments --paginate`)
+  ghApi(`repos/${owner}/${repo}/pulls/${prNumber}/comments --paginate`)
 ).map((c) => `${c.user.login} sur ${c.path} : ${c.body}`).join("\n");
 
 execSync(`git checkout ${pr.headRefName}`, { stdio: "inherit" });
