@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { makeExercise } from "../lib/exercises";
 
 const TOTAL = 10;
+const POINTS_CORRECT = 10;
+const POINTS_INCORRECT = -5;
 
 export default function Quiz({ mode, difficulty, onExit }) {
   const [score, setScore] = useState(0);
@@ -10,6 +12,10 @@ export default function Quiz({ mode, difficulty, onExit }) {
   const [feedback, setFeedback] = useState(null);
   const [answers, setAnswers] = useState([]);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [points, setPoints] = useState(() => {
+    const savedPoints = localStorage.getItem('quizPoints');
+    return savedPoints ? parseInt(savedPoints, 10) : 0;
+  });
   const exercise = useMemo(() => makeExercise(mode, difficulty), [mode, difficulty, count]);
 
   useEffect(() => {
@@ -18,12 +24,21 @@ export default function Quiz({ mode, difficulty, onExit }) {
     setShowFeedback(false);
   }, [count]);
 
+  useEffect(() => {
+    localStorage.setItem('quizPoints', points.toString());
+  }, [points]);
+
   function submit(e) {
     e.preventDefault();
     if (feedback !== null) return;
     const ok = Number(value) === exercise.answer;
     setFeedback(ok);
     setShowFeedback(true);
+    
+    // Mettre à jour les points
+    const newPoints = ok ? points + POINTS_CORRECT : points + POINTS_INCORRECT;
+    setPoints(newPoints);
+    
     if (ok) setScore((s) => s + 1);
     setAnswers((a) => [...a, ok]);
     
@@ -60,6 +75,9 @@ export default function Quiz({ mode, difficulty, onExit }) {
 
   return (
     <div className="card">
+      <div className="points-display">
+        <p>🏆 Points : {points}</p>
+      </div>
       <p className="progress">
         Question {count + 1} / {TOTAL} — Score : {score}
       </p>
@@ -80,6 +98,9 @@ export default function Quiz({ mode, difficulty, onExit }) {
         <div>
           <div className={`feedback ${showFeedback ? (feedback ? 'feedback-ok' : 'feedback-ko') : ''}`}>
             {feedback ? "✅ Bravo !" : `❌ La réponse était ${exercise.answer}`}
+          </div>
+          <div className="points-feedback">
+            {feedback ? `+${POINTS_CORRECT} points` : `-${Math.abs(POINTS_INCORRECT)} points`}
           </div>
           <button onClick={next}>Question suivante</button>
         </div>

@@ -109,3 +109,17 @@ input {
   padding: 0.5rem;
   border-radius: 8px;
 }
+
+.points-display {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #4a90d9;
+  margin-bottom: -1rem;
+}
+
+.points-feedback {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin: 0.5rem 0;
+  color: #2e7d32;
+}
