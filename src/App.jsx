@@ -1,8 +1,8 @@
 import { useState } from "react";
 import Quiz from "./components/Quiz";
-import { ADDITIONS, SOUSTRACTIONS, MULTIPLICATIONS, LEVELS, DIFFICULTY_LEVELS } from "./lib/exercises";
+import { ADDITIONS, SOUSTRACTIONS, MULTIPLICATIONS, DIVISIONS, LEVELS, DIFFICULTY_LEVELS } from "./lib/exercises";
 
-const MODES = [ADDITIONS, SOUSTRACTIONS, MULTIPLICATIONS];
+const MODES = [ADDITIONS, SOUSTRACTIONS, MULTIPLICATIONS, DIVISIONS];
 
 export default function App() {
   const [mode, setMode] = useState(null);
