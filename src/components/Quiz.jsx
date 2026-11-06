@@ -5,6 +5,8 @@ const TOTAL = 10;
 const POINTS_CORRECT = 10;
 const POINTS_INCORRECT = -5;
 
+const CONFIRMATION_MESSAGE = "Toutes tes réponses seront perdues. Es-tu sûr de vouloir annuler ?";
+
 export default function Quiz({ mode, difficulty, onExit }) {
   const [score, setScore] = useState(0);
   const [count, setCount] = useState(0);
@@ -16,12 +18,14 @@ export default function Quiz({ mode, difficulty, onExit }) {
     const savedPoints = localStorage.getItem('quizPoints');
     return savedPoints ? parseInt(savedPoints, 10) : 0;
   });
+  const [hasAnswered, setHasAnswered] = useState(false);
   const exercise = useMemo(() => makeExercise(mode, difficulty), [mode, difficulty, count]);
 
   useEffect(() => {
     setValue("");
     setFeedback(null);
     setShowFeedback(false);
+    setHasAnswered(false);
   }, [count]);
 
   useEffect(() => {
@@ -34,6 +38,7 @@ export default function Quiz({ mode, difficulty, onExit }) {
     const ok = Number(value) === exercise.answer;
     setFeedback(ok);
     setShowFeedback(true);
+    setHasAnswered(true);
     
     // Mettre à jour les points
     const newPoints = ok ? points + POINTS_CORRECT : points + POINTS_INCORRECT;
@@ -53,6 +58,16 @@ export default function Quiz({ mode, difficulty, onExit }) {
       setCount(TOTAL);
     } else {
       setCount((c) => c + 1);
+    }
+  }
+
+  function handleCancel() {
+    if (hasAnswered) {
+      if (window.confirm(CONFIRMATION_MESSAGE)) {
+        onExit();
+      }
+    } else {
+      onExit();
     }
   }
 
@@ -105,6 +120,9 @@ export default function Quiz({ mode, difficulty, onExit }) {
           <button onClick={next}>Question suivante</button>
         </div>
       )}
+      <button onClick={handleCancel} style={{ marginTop: '1rem' }}>
+        Annuler
+      </button>
     </div>
   );
 }
