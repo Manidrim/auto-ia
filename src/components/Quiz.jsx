@@ -93,9 +93,10 @@ export default function Quiz({ mode, difficulty, onExit }) {
       <div className="points-display">
         <p>🏆 Points : {points}</p>
       </div>
-      <p className="progress">
-        Question {count + 1} / {TOTAL} — Score : {score}
-      </p>
+      <div className="progress-bar-container">
+        <div className="progress-bar" style={{ width: `${(count / TOTAL) * 100}%` }}></div>
+        <span className="progress-text">{count + 1} / {TOTAL}</span>
+      </div>
       <p className="question">{exercise.question} = ?</p>
       {feedback === null ? (
         <form onSubmit={submit}>
