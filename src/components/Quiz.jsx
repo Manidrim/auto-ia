@@ -7,7 +7,7 @@ const POINTS_INCORRECT = -5;
 
 const CONFIRMATION_MESSAGE = "Toutes tes réponses seront perdues. Es-tu sûr de vouloir annuler ?";
 
-export default function Quiz({ mode, difficulty, onExit }) {
+export default function Quiz({ mode, classe, onExit }) {
   const [score, setScore] = useState(0);
   const [count, setCount] = useState(0);
   const [value, setValue] = useState("");
@@ -19,7 +19,7 @@ export default function Quiz({ mode, difficulty, onExit }) {
     return savedPoints ? parseInt(savedPoints, 10) : 0;
   });
   const [hasAnswered, setHasAnswered] = useState(false);
-  const exercise = useMemo(() => makeExercise(mode, difficulty), [mode, difficulty, count]);
+  const exercise = useMemo(() => makeExercise(mode, classe), [mode, classe, count]);
 
   useEffect(() => {
     setValue("");

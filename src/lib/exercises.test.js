@@ -6,7 +6,7 @@ import {
   DIVISIONS,
   makeExercise,
   randomInt,
-  DIFFICULTY_LEVELS,
+  CLASSES,
 } from "./exercises";
 
 describe("randomInt", () => {
@@ -20,94 +20,113 @@ describe("randomInt", () => {
 });
 
 describe("makeExercise", () => {
-  it("génère une addition correcte", () => {
-    const ex = makeExercise(ADDITIONS);
-    const [a, b] = ex.question.split(" + ").map(Number);
-    expect(ex.answer).toBe(a + b);
-  });
-
-  it("génère une soustraction avec un résultat positif", () => {
-    const ex = makeExercise(SOUSTRACTIONS);
-    const [a, b] = ex.question.split(" - ").map(Number);
-    expect(ex.answer).toBe(a - b);
-    expect(ex.answer).toBeGreaterThanOrEqual(0);
-  });
-
-  it("génère une multiplication correcte", () => {
-    const ex = makeExercise(MULTIPLICATIONS);
-    const [a, b] = ex.question.split(" × ").map(Number);
-    expect(ex.answer).toBe(a * b);
-  });
-
-  it("génère une division correcte", () => {
-    const ex = makeExercise(DIVISIONS);
-    const [a, b] = ex.question.split(" ÷ ").map(Number);
-    expect(ex.answer).toBe(a / b);
-    expect(Number.isInteger(ex.answer)).toBe(true);
-  });
-
-  it("rejette un mode inconnu", () => {
-    expect(() => makeExercise("inconnu")).toThrow();
-  });
-
-  describe("niveaux de difficulté", () => {
-    it("facile limite les nombres à 1-10 pour additions", () => {
-      const ex = makeExercise(ADDITIONS, DIFFICULTY_LEVELS.EASY);
-      const [a, b] = ex.question.split(" + ").map(Number);
-      expect(a).toBeGreaterThanOrEqual(1);
-      expect(a).toBeLessThanOrEqual(10);
-      expect(b).toBeGreaterThanOrEqual(1);
-      expect(b).toBeLessThanOrEqual(10);
+  describe("CP", () => {
+    it("autorise uniquement additions et soustractions", () => {
+      expect(() => makeExercise(MULTIPLICATIONS, CLASSES.CP)).toThrow();
+      expect(() => makeExercise(DIVISIONS, CLASSES.CP)).toThrow();
+      expect(() => makeExercise(ADDITIONS, CLASSES.CP)).not.toThrow();
+      expect(() => makeExercise(SOUSTRACTIONS, CLASSES.CP)).not.toThrow();
     });
 
-    it("moyen limite les nombres à 1-50 pour additions", () => {
-      const ex = makeExercise(ADDITIONS, DIFFICULTY_LEVELS.MEDIUM);
+    it("génère une addition correcte avec nombres jusqu'à 100", () => {
+      const ex = makeExercise(ADDITIONS, CLASSES.CP);
       const [a, b] = ex.question.split(" + ").map(Number);
-      expect(a).toBeGreaterThanOrEqual(1);
-      expect(a).toBeLessThanOrEqual(50);
-      expect(b).toBeGreaterThanOrEqual(1);
-      expect(b).toBeLessThanOrEqual(50);
-    });
-
-    it("difficile limite les nombres à 1-100 pour additions", () => {
-      const ex = makeExercise(ADDITIONS, DIFFICULTY_LEVELS.HARD);
-      const [a, b] = ex.question.split(" + ").map(Number);
+      expect(ex.answer).toBe(a + b);
       expect(a).toBeGreaterThanOrEqual(1);
       expect(a).toBeLessThanOrEqual(100);
       expect(b).toBeGreaterThanOrEqual(1);
       expect(b).toBeLessThanOrEqual(100);
     });
 
-    it("respecte les limites de mode pour multiplications", () => {
-      const exEasy = makeExercise(MULTIPLICATIONS, DIFFICULTY_LEVELS.EASY);
-      const [aEasy, bEasy] = exEasy.question.split(" × ").map(Number);
-      expect(aEasy).toBeGreaterThanOrEqual(1);
-      expect(aEasy).toBeLessThanOrEqual(10);
-      expect(bEasy).toBeGreaterThanOrEqual(1);
-      expect(bEasy).toBeLessThanOrEqual(10);
+    it("génère une soustraction avec un résultat positif", () => {
+      const ex = makeExercise(SOUSTRACTIONS, CLASSES.CP);
+      const [a, b] = ex.question.split(" - ").map(Number);
+      expect(ex.answer).toBe(a - b);
+      expect(ex.answer).toBeGreaterThanOrEqual(0);
+      expect(a).toBeGreaterThanOrEqual(1);
+      expect(a).toBeLessThanOrEqual(100);
+      expect(b).toBeGreaterThanOrEqual(1);
+      expect(b).toBeLessThanOrEqual(a);
+    });
+  });
 
-      const exHard = makeExercise(MULTIPLICATIONS, DIFFICULTY_LEVELS.HARD);
-      const [aHard, bHard] = exHard.question.split(" × ").map(Number);
-      expect(aHard).toBeGreaterThanOrEqual(1);
-      expect(aHard).toBeLessThanOrEqual(10);
-      expect(bHard).toBeGreaterThanOrEqual(1);
-      expect(bHard).toBeLessThanOrEqual(10);
+  describe("CE1", () => {
+    it("autorise additions, soustractions et multiplications", () => {
+      expect(() => makeExercise(ADDITIONS, CLASSES.CE1)).not.toThrow();
+      expect(() => makeExercise(SOUSTRACTIONS, CLASSES.CE1)).not.toThrow();
+      expect(() => makeExercise(MULTIPLICATIONS, CLASSES.CE1)).not.toThrow();
+      expect(() => makeExercise(DIVISIONS, CLASSES.CE1)).toThrow();
     });
 
-    it("respecte les limites de mode pour divisions", () => {
-      const exEasy = makeExercise(DIVISIONS, DIFFICULTY_LEVELS.EASY);
-      const [aEasy, bEasy] = exEasy.question.split(" ÷ ").map(Number);
-      expect(bEasy).toBeGreaterThanOrEqual(1);
-      expect(bEasy).toBeLessThanOrEqual(10);
-      expect(aEasy / bEasy).toBeGreaterThanOrEqual(1);
-      expect(aEasy / bEasy).toBeLessThanOrEqual(10);
-
-      const exHard = makeExercise(DIVISIONS, DIFFICULTY_LEVELS.HARD);
-      const [aHard, bHard] = exHard.question.split(" ÷ ").map(Number);
-      expect(bHard).toBeGreaterThanOrEqual(1);
-      expect(bHard).toBeLessThanOrEqual(20);
-      expect(aHard / bHard).toBeGreaterThanOrEqual(1);
-      expect(aHard / bHard).toBeLessThanOrEqual(20);
+    it("génère une multiplication avec tables de 1 à 10", () => {
+      const ex = makeExercise(MULTIPLICATIONS, CLASSES.CE1);
+      const [a, b] = ex.question.split(" × ").map(Number);
+      expect(ex.answer).toBe(a * b);
+      expect(b).toBeGreaterThanOrEqual(1);
+      expect(b).toBeLessThanOrEqual(10);
+      expect(a).toBeGreaterThanOrEqual(1);
+      expect(a).toBeLessThanOrEqual(100);
     });
+  });
+
+  describe("CE2", () => {
+    it("autorise toutes les opérations", () => {
+      expect(() => makeExercise(ADDITIONS, CLASSES.CE2)).not.toThrow();
+      expect(() => makeExercise(SOUSTRACTIONS, CLASSES.CE2)).not.toThrow();
+      expect(() => makeExercise(MULTIPLICATIONS, CLASSES.CE2)).not.toThrow();
+      expect(() => makeExercise(DIVISIONS, CLASSES.CE2)).not.toThrow();
+    });
+
+    it("génère une division simple", () => {
+      const ex = makeExercise(DIVISIONS, CLASSES.CE2);
+      const [a, b] = ex.question.split(" ÷ ").map(Number);
+      expect(ex.answer).toBe(a / b);
+      expect(Number.isInteger(ex.answer)).toBe(true);
+      expect(a).toBeGreaterThanOrEqual(1);
+      expect(a).toBeLessThanOrEqual(1000);
+      expect(b).toBeGreaterThanOrEqual(1);
+      expect(b).toBeLessThanOrEqual(20);
+    });
+  });
+
+  describe("CM1", () => {
+    it("autorise toutes les opérations avec nombres jusqu'à 10000", () => {
+      const exAdd = makeExercise(ADDITIONS, CLASSES.CM1);
+      const [aAdd, bAdd] = exAdd.question.split(" + ").map(Number);
+      expect(aAdd).toBeGreaterThanOrEqual(1);
+      expect(aAdd).toBeLessThanOrEqual(10000);
+      expect(bAdd).toBeGreaterThanOrEqual(1);
+      expect(bAdd).toBeLessThanOrEqual(10000);
+
+      const exMul = makeExercise(MULTIPLICATIONS, CLASSES.CM1);
+      const [aMul, bMul] = exMul.question.split(" × ").map(Number);
+      expect(aMul).toBeGreaterThanOrEqual(1);
+      expect(aMul).toBeLessThanOrEqual(10000);
+      expect(bMul).toBeGreaterThanOrEqual(1);
+      expect(bMul).toBeLessThanOrEqual(10000);
+    });
+  });
+
+  describe("CM2", () => {
+    it("autorise toutes les opérations avec grands nombres", () => {
+      const exAdd = makeExercise(ADDITIONS, CLASSES.CM2);
+      const [aAdd, bAdd] = exAdd.question.split(" + ").map(Number);
+      expect(aAdd).toBeGreaterThanOrEqual(1);
+      expect(aAdd).toBeLessThanOrEqual(1000000);
+      expect(bAdd).toBeGreaterThanOrEqual(1);
+      expect(bAdd).toBeLessThanOrEqual(1000000);
+
+      const exDiv = makeExercise(DIVISIONS, CLASSES.CM2);
+      const [aDiv, bDiv] = exDiv.question.split(" ÷ ").map(Number);
+      expect(aDiv).toBeGreaterThanOrEqual(1);
+      expect(aDiv).toBeLessThanOrEqual(1000000);
+      expect(bDiv).toBeGreaterThanOrEqual(1);
+      expect(bDiv).toBeLessThanOrEqual(20);
+    });
+  });
+
+  it("rejette un mode non autorisé pour une classe", () => {
+    expect(() => makeExercise(MULTIPLICATIONS, CLASSES.CP)).toThrow();
+    expect(() => makeExercise(DIVISIONS, CLASSES.CE1)).toThrow();
   });
 });
