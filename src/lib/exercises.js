@@ -10,10 +10,37 @@ const LEVELS = {
   [DIVISIONS]: { min: 1, max: 20, label: "Divisions" },
 };
 
-const DIFFICULTY_LEVELS = {
-  EASY: { min: 1, max: 10, label: "Facile" },
-  MEDIUM: { min: 1, max: 50, label: "Moyen" },
-  HARD: { min: 1, max: 100, label: "Difficile" },
+const CLASSES = {
+  CP: {
+    min: 1,
+    max: 100,
+    allowedModes: [ADDITIONS, SOUSTRACTIONS],
+    label: "CP",
+  },
+  CE1: {
+    min: 1,
+    max: 100,
+    allowedModes: [ADDITIONS, SOUSTRACTIONS, MULTIPLICATIONS],
+    label: "CE1",
+  },
+  CE2: {
+    min: 1,
+    max: 1000,
+    allowedModes: [ADDITIONS, SOUSTRACTIONS, MULTIPLICATIONS, DIVISIONS],
+    label: "CE2",
+  },
+  CM1: {
+    min: 1,
+    max: 10000,
+    allowedModes: [ADDITIONS, SOUSTRACTIONS, MULTIPLICATIONS, DIVISIONS],
+    label: "CM1",
+  },
+  CM2: {
+    min: 1,
+    max: 1000000,
+    allowedModes: [ADDITIONS, SOUSTRACTIONS, MULTIPLICATIONS, DIVISIONS],
+    label: "CM2",
+  },
 };
 
 function randomInt(min, max) {
@@ -22,14 +49,16 @@ function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function makeExercise(mode, difficulty = DIFFICULTY_LEVELS.MEDIUM) {
-  const { min, max } = LEVELS[mode];
-  const { min: diffMin, max: diffMax } = difficulty;
-  
-  // Appliquer les bornes de difficulté
-  const effectiveMin = Math.max(min, diffMin);
-  const effectiveMax = Math.min(max, diffMax);
-  
+function makeExercise(mode, classe = CLASSES.CE2) {
+  const { min, max, allowedModes } = classe;
+
+  if (!allowedModes.includes(mode)) {
+    throw new Error(`Le mode ${mode} n'est pas autorisé pour la classe ${classe.label}`);
+  }
+
+  const effectiveMin = min;
+  const effectiveMax = max;
+
   if (mode === ADDITIONS) {
     const a = randomInt(effectiveMin, effectiveMax);
     const b = randomInt(effectiveMin, effectiveMax);
@@ -42,16 +71,16 @@ function makeExercise(mode, difficulty = DIFFICULTY_LEVELS.MEDIUM) {
   }
   if (mode === MULTIPLICATIONS) {
     const a = randomInt(effectiveMin, effectiveMax);
-    const b = randomInt(effectiveMin, effectiveMax);
+    const b = randomInt(1, 10); // Tables de multiplication de 1 à 10
     return { question: `${a} × ${b}`, answer: a * b };
   }
   if (mode === DIVISIONS) {
-    const b = randomInt(effectiveMin, effectiveMax);
-    const result = randomInt(effectiveMin, effectiveMax);
+    const b = randomInt(1, Math.min(20, Math.floor(effectiveMax / 2)));
+    const result = randomInt(1, Math.min(20, Math.floor(effectiveMax / b)));
     const a = b * result;
     return { question: `${a} ÷ ${b}`, answer: result };
   }
   throw new Error(`Mode inconnu : ${mode}`);
 }
 
-export { ADDITIONS, SOUSTRACTIONS, MULTIPLICATIONS, DIVISIONS, LEVELS, DIFFICULTY_LEVELS, makeExercise, randomInt };
+export { ADDITIONS, SOUSTRACTIONS, MULTIPLICATIONS, DIVISIONS, LEVELS, CLASSES, makeExercise, randomInt };
