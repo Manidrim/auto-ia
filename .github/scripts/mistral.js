@@ -2,7 +2,7 @@ import { request } from "https";
 
 const API_URL = "https://api.mistral.ai/v1/chat/completions";
 
-export function chat(messages, { model = "mistral-small-latest", maxTokens = 4096, temperature = 0.2 } = {}) {
+export function chat(messages, { model = "mistral-small-latest", maxTokens = 16384, temperature = 0.2 } = {}) {
   const apiKey = process.env.MISTRAL_API_KEY;
   if (!apiKey) throw new Error("MISTRAL_API_KEY manquant");
 
@@ -33,7 +33,12 @@ export function chat(messages, { model = "mistral-small-latest", maxTokens = 409
           }
           try {
             const json = JSON.parse(data);
-            resolve(json.choices[0].message.content);
+            const choice = json.choices[0];
+            if (choice.finish_reason === "length") {
+              reject(new Error("Réponse Mistral tronquée (limite max_tokens atteinte) : augmente maxTokens ou réduis la taille de la sortie demandée."));
+              return;
+            }
+            resolve(choice.message.content);
           } catch (err) {
             reject(err);
           }
