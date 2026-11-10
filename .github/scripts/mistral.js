@@ -52,15 +52,50 @@ export function chat(messages, { model = "mistral-small-latest", maxTokens = 163
   });
 }
 
+function jsonCandidates(raw) {
+  const candidates = [];
+  const slice = (s) => {
+    const start = s.indexOf("{");
+    const end = s.lastIndexOf("}");
+    return start !== -1 && end > start ? s.slice(start, end + 1) : null;
+  };
+
+  const direct = slice(raw);
+  if (direct) candidates.push(direct);
+
+  try {
+    const decoded = JSON.parse(raw.trim());
+    if (typeof decoded === "string") {
+      const inner = slice(decoded);
+      if (inner) candidates.push(inner);
+    }
+  } catch {}
+
+  const unescaped = raw
+    .replace(/\\\\/g, "\u0000")
+    .replace(/\\n/g, "\n")
+    .replace(/\\r/g, "\r")
+    .replace(/\\t/g, "\t")
+    .replace(/\\"/g, '"')
+    .replace(/\u0000/g, "\\");
+  const unescapedSlice = slice(unescaped);
+  if (unescapedSlice) candidates.push(unescapedSlice);
+
+  return candidates;
+}
+
 export function extractJson(text) {
   const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
   const raw = fenced ? fenced[1] : text;
-  const start = raw.indexOf("{");
-  const end = raw.lastIndexOf("}");
-  if (start === -1 || end <= start) {
-    throw new Error(`Pas de JSON trouvé dans la réponse (début reçu : ${JSON.stringify(raw.slice(0, 200))})`);
+  const candidates = jsonCandidates(raw);
+  for (const candidate of candidates) {
+    try {
+      return JSON.parse(candidate);
+    } catch {}
   }
-  return JSON.parse(raw.slice(start, end + 1));
+  throw new Error(
+    `Pas de JSON valide dans la réponse (début reçu : ${JSON.stringify(raw.slice(0, 200))})`
+  );
 }
 
 export async function chatJson(messages, { attempts = 3, ...options } = {}) {
