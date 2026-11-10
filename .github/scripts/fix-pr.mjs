@@ -1,6 +1,6 @@
 import { execSync } from "node:child_process";
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
-import { chat, extractJson } from "./mistral.js";
+import { chatJson } from "./mistral.js";
 
 const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
 const prNumber = process.env.PR_NUMBER;
@@ -52,7 +52,7 @@ for (const f of repoFiles.split("\n")) {
   }
 }
 
-const response = await chat([
+const plan = await chatJson([
   {
     role: "system",
     content:
@@ -74,7 +74,6 @@ const response = await chat([
   },
 ]);
 
-const plan = extractJson(response);
 for (const file of plan.files) {
   writeFileSync(file.path, file.content);
 }
