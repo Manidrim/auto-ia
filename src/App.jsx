@@ -32,7 +32,12 @@ export default function App() {
         <ul>
           {Object.values(CLASSES).map((c) => (
             <li key={c.label}>
-              <button onClick={() => setClasse(c)}>{c.label}</button>
+              <button
+                onClick={() => setClasse(c)}
+                className={classe?.label === c.label ? 'selected' : ''}
+              >
+                {c.label}
+              </button>
             </li>
           ))}
         </ul>
