@@ -1,6 +1,6 @@
 import { execSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
-import { chat, extractJson } from "./mistral.js";
+import { chatJson } from "./mistral.js";
 
 const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
 const token = process.env.GITHUB_TOKEN;
@@ -15,7 +15,7 @@ function gh(args) {
 const pr = JSON.parse(gh(`pr view ${process.env.PR_NUMBER} --json title,body,labels`));
 const openIssues = JSON.parse(gh("issue list --state open --json number,title --limit 50"));
 
-const response = await chat([
+const next = await chatJson([
   {
     role: "system",
     content:
@@ -34,7 +34,6 @@ const response = await chat([
   },
 ]);
 
-const next = extractJson(response);
 const bodyFile = "/tmp/issue-body.md";
 writeFileSync(bodyFile, next.body);
 
