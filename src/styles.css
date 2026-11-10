@@ -36,10 +36,16 @@ button {
   color: white;
   cursor: pointer;
   width: 100%;
+  transition: background-color 0.2s ease;
 }
 
 button:hover {
   background: #357abd;
+}
+
+button.selected {
+  background: #2e7d32;
+  font-weight: bold;
 }
 
 .card {
