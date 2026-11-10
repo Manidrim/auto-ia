@@ -1,12 +1,13 @@
 import { useState } from "react";
 import Quiz from "./components/Quiz";
+import ProgressionBar from "./components/ProgressionBar";
 import { ADDITIONS, SOUSTRACTIONS, MULTIPLICATIONS, DIVISIONS, LEVELS, CLASSES } from "./lib/exercises";
 
 const MODES = [ADDITIONS, SOUSTRACTIONS, MULTIPLICATIONS, DIVISIONS];
 
 export default function App() {
   const [mode, setMode] = useState(null);
-  const [classe, setClasse] = useState(null);
+  const [classe, setClasse] = useState(CLASSES.CE2);
 
   if (mode === null) {
     return (
@@ -20,6 +21,13 @@ export default function App() {
             </li>
           ))}
         </ul>
+        <div className="card">
+          <h2>📊 Ta progression</h2>
+          <ProgressionBar
+            currentLevel={classe}
+            onLevelSelect={(level) => setClasse(level)}
+          />
+        </div>
       </main>
     );
   }
@@ -44,6 +52,13 @@ export default function App() {
         <button onClick={() => setMode(null)} style={{ marginTop: '1rem' }}>
           Retour
         </button>
+        <div className="card">
+          <h2>📊 Ta progression</h2>
+          <ProgressionBar
+            currentLevel={classe}
+            onLevelSelect={(level) => setClasse(level)}
+          />
+        </div>
       </main>
     );
   }
