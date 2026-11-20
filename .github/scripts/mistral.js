@@ -52,23 +52,45 @@ export function chat(messages, { model = "mistral-small-latest", maxTokens = 163
   });
 }
 
+function balancedSlice(s) {
+  const start = s.indexOf("{");
+  if (start === -1) return null;
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+  for (let i = start; i < s.length; i++) {
+    const c = s[i];
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (c === "\\") escaped = true;
+      else if (c === '"') inString = false;
+    } else if (c === '"') {
+      inString = true;
+    } else if (c === "{") {
+      depth++;
+    } else if (c === "}") {
+      depth--;
+      if (depth === 0) return s.slice(start, i + 1);
+    }
+  }
+  return null;
+}
+
 function jsonCandidates(raw) {
   const candidates = [];
-  const slice = (s) => {
-    const start = s.indexOf("{");
-    const end = s.lastIndexOf("}");
-    return start !== -1 && end > start ? s.slice(start, end + 1) : null;
+  const push = (s) => {
+    const found = balancedSlice(s);
+    if (found) candidates.push(found);
   };
 
-  const direct = slice(raw);
-  if (direct) candidates.push(direct);
+  push(raw);
+
+  const fencedBlocks = [...raw.matchAll(/```[a-zA-Z]*\s*([\s\S]*?)```/g)].map((m) => m[1]);
+  for (const block of fencedBlocks) push(block);
 
   try {
     const decoded = JSON.parse(raw.trim());
-    if (typeof decoded === "string") {
-      const inner = slice(decoded);
-      if (inner) candidates.push(inner);
-    }
+    if (typeof decoded === "string") push(decoded);
   } catch {}
 
   const unescaped = raw
@@ -78,23 +100,20 @@ function jsonCandidates(raw) {
     .replace(/\\t/g, "\t")
     .replace(/\\"/g, '"')
     .replace(/\u0000/g, "\\");
-  const unescapedSlice = slice(unescaped);
-  if (unescapedSlice) candidates.push(unescapedSlice);
+  push(unescaped);
 
   return candidates;
 }
 
 export function extractJson(text) {
-  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-  const raw = fenced ? fenced[1] : text;
-  const candidates = jsonCandidates(raw);
+  const candidates = jsonCandidates(text);
   for (const candidate of candidates) {
     try {
       return JSON.parse(candidate);
     } catch {}
   }
   throw new Error(
-    `Pas de JSON valide dans la réponse (début reçu : ${JSON.stringify(raw.slice(0, 200))})`
+    `Pas de JSON valide dans la réponse (début reçu : ${JSON.stringify(text.slice(0, 200))})`
   );
 }
 

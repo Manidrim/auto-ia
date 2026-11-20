@@ -17,7 +17,9 @@ Projet qui **s'auto-alimente** : l'IA propose, tu valides, l'IA code, la CI vér
 
 ## Le site
 
-Site Vite + React pour des élèves de primaire : exercices de maths (additions, soustractions, multiplications) avec score et feedback immédiat.
+Site Vite + React pour des élèves de primaire (CP à CM2) : exercices dans les matières du programme scolaire — français, maths, histoire, géographie, sciences, anglais, EMC — avec score et feedback immédiat.
+
+**Orientation produit** : les issues générées automatiquement doivent apporter du contenu pédagogique de niveau (matières et notions du programme, par classe), pas seulement des fonctionnalités d'interface.
 
 ```bash
 npm install
