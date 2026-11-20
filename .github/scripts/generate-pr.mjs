@@ -131,7 +131,7 @@ execSync(`git push origin ${branch} --force`, { stdio: "inherit" });
 const bodyFile = "/tmp/pr-body.md";
 writeFileSync(
   bodyFile,
-  `## Summary\n- ${plan.summary || `Implémentation automatique de l'issue #${issueNumber}`}\n\nGénéré automatiquement par l'IA à partir de l'issue validée.\n\nCloses #${issueNumber}\n`
+  `## Summary\n- ${plan.summary || `Implémentation automatique de l'issue #${issueNumber}`}\n\nGénéré automatiquement par l'IA à partir de l'issue validée.\n\n## Commandes pour tester en local\n- npm install\n- npm run dev\n- npm test\n- npm run build\n- npm run preview\n\nCloses #${issueNumber}\n`
 );
 
 execSync(
