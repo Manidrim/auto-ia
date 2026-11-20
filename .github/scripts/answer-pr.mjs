@@ -1,35 +1,50 @@
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { execSync } from "node:child_process";
+import { writeFileSync } from "node:fs";
+import { chat } from "./mistral.js";
+import { loadPrompt } from "./prompts.js";
 
-const configPath = join(process.cwd(), '.github/ai/config.yml');
-const config = JSON.parse(require('child_process').execSync(`node -e "console.log(JSON.stringify(require('js-yaml').load(require('fs').readFileSync('${configPath}', 'utf8'))))"`));
+const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
+const prNumber = process.env.PR_NUMBER;
+const token = process.env.GITHUB_TOKEN;
 
-const issue = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
-const comments = issue.comments ? issue.comments.map(c => c.body).join('\n') : '';
+function gh(args) {
+  return execSync(`gh ${args} --repo ${owner}/${repo}`, {
+    env: { ...process.env, GH_TOKEN: token },
+    encoding: "utf8",
+  }).trim();
+}
 
-const systemPrompt = readFileSync('.github/ai/prompts/answer-pr.system.md', 'utf8');
-const userPrompt = readFileSync('.github/ai/prompts/answer-pr.user.md', 'utf8')
-  .replace('{{issue}}', issue.body)
-  .replace('{{comments}}', comments);
+function ghApi(endpoint) {
+  return execSync(`gh api ${endpoint}`, {
+    env: { ...process.env, GH_TOKEN: token },
+    encoding: "utf8",
+  }).trim();
+}
 
-const prompt = `${systemPrompt}\n\n${userPrompt}`;
+const pr = JSON.parse(
+  gh(`pr view ${prNumber} --json title,body,state`)
+);
 
-const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${process.env.MISTRAL_API_KEY}`
+const comments = JSON.parse(
+  ghApi(`repos/${owner}/${repo}/issues/${prNumber}/comments --paginate`)
+).map((c) => `${c.user.login} : ${c.body}`).join("\n");
+
+const answer = await chat([
+  { role: "system", content: loadPrompt("answer-pr.system") },
+  {
+    role: "user",
+    content: loadPrompt("answer-pr.user", {
+      prTitle: pr.title,
+      prBody: pr.body,
+      comments,
+    }),
   },
-  body: JSON.stringify({
-    model: 'mistral-large-latest',
-    messages: [
-      { role: 'user', content: prompt }
-    ],
-    response_format: { type: 'json_object' }
-  })
+]);
+
+
+const bodyFile = "/tmp/answer.md";
+writeFileSync(bodyFile, answer);
+execSync(`gh pr comment ${prNumber} --repo ${owner}/${repo} --body-file ${bodyFile}`, {
+  env: { ...process.env, GH_TOKEN: token },
+  stdio: "inherit",
 });
-
-const data = await response.json();
-const result = JSON.parse(data.choices[0].message.content);
-
-console.log(JSON.stringify(result));

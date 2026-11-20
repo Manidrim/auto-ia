@@ -1,35 +1,53 @@
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { execSync } from "node:child_process";
+import { readFileSync, writeFileSync, readdirSync, existsSync } from "node:fs";
+import { chatJson } from "./mistral.js";
+import { loadPrompt } from "./prompts.js";
 
-const configPath = join(process.cwd(), '.github/ai/config.yml');
-const config = JSON.parse(require('child_process').execSync(`node -e "console.log(JSON.stringify(require('js-yaml').load(require('fs').readFileSync('${configPath}', 'utf8'))))"`));
+const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
+const token = process.env.GITHUB_TOKEN;
 
-const issue = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
-const comments = issue.comments ? issue.comments.map(c => c.body).join('\n') : '';
+function gh(args) {
+  return execSync(`gh ${args} --repo ${owner}/${repo}`, {
+    env: { ...process.env, GH_TOKEN: token },
+    encoding: "utf8",
+  }).trim();
+}
 
-const systemPrompt = readFileSync('.github/ai/prompts/create-next-issue.system.md', 'utf8');
-const userPrompt = readFileSync('.github/ai/prompts/create-next-issue.user.md', 'utf8')
-  .replace('{{issue}}', issue.body)
-  .replace('{{comments}}', comments);
+const pr = JSON.parse(gh(`pr view ${process.env.PR_NUMBER} --json title,body,labels`));
+const openIssues = JSON.parse(gh("issue list --state open --json number,title --limit 50"));
 
-const prompt = `${systemPrompt}\n\n${userPrompt}`;
+let currentContent = "(aucun fichier src/lib trouvé)";
+const libDir = "src/lib";
+if (existsSync(libDir)) {
+  const parts = [];
+  for (const f of readdirSync(libDir)) {
+    if (/\.jsx?$/.test(f)) {
+      const path = `${libDir}/${f}`;
+      const content = readFileSync(path, "utf8");
+      if (content.length < 4000) parts.push(`--- ${path} ---\n${content}`);
+    }
+  }
+  if (parts.length > 0) currentContent = parts.join("\n\n");
+}
 
-const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${process.env.MISTRAL_API_KEY}`
+const next = await chatJson([
+  { role: "system", content: loadPrompt("create-next-issue.system") },
+  {
+    role: "user",
+    content: loadPrompt("create-next-issue.user", {
+      prTitle: pr.title,
+      prBody: pr.body,
+      currentContent,
+      openIssues: JSON.stringify(openIssues),
+    }),
   },
-  body: JSON.stringify({
-    model: 'mistral-large-latest',
-    messages: [
-      { role: 'user', content: prompt }
-    ],
-    response_format: { type: 'json_object' }
-  })
-});
+]);
 
-const data = await response.json();
-const result = JSON.parse(data.choices[0].message.content);
 
-console.log(JSON.stringify(result));
+const bodyFile = "/tmp/issue-body.md";
+writeFileSync(bodyFile, next.body);
+
+execSync(
+  `gh issue create --repo ${owner}/${repo} --title ${JSON.stringify(next.title)} --body-file ${bodyFile} --label enhancement`,
+  { stdio: "inherit", env: { ...process.env, GH_TOKEN: token } }
+);

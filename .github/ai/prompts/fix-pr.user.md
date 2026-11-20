@@ -1,11 +1,17 @@
-Voici l'issue à corriger :
+PR : {{prTitle}}
 
-{{issue}}
+{{prBody}}
 
-Voici les fichiers concernés par l'issue :
-{{files}}
-
-Voici les commentaires associés à l'issue :
+Retours à appliquer (commentaires) :
 {{comments}}
 
-Respecte strictement le format de sortie JSON demandé.
+Retours sur le code (reviews) :
+{{reviewComments}}
+
+Fichiers du projet :
+{{repoFiles}}
+
+Contenus actuels :
+{{fileContents}}
+
+Applique uniquement les retours demandés, de façon minimale. Réponds uniquement avec l'objet JSON demandé.

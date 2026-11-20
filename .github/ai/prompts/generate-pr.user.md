@@ -1,11 +1,15 @@
-Voici l'issue à traiter :
+Fichiers du projet :
+{{repoFiles}}
 
-{{issue}}
+Contenus actuels :
+{{fileContents}}
 
-Voici les fichiers concernés par l'issue :
-{{files}}
+Issue à implémenter :
+# {{issueNumber}} {{issueTitle}}
 
-Voici les commentaires associés à l'issue :
+{{issueBody}}
+
+Commentaires (précisions du product owner) :
 {{comments}}
 
-Respecte strictement le format de sortie JSON demandé.
+Implémente cette issue de façon minimale et propre. Réponds uniquement avec l'objet JSON demandé.

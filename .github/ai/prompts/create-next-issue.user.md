@@ -1,8 +1,12 @@
-Voici l'issue précédente :
+PR qui vient d'être mergée :
+{{prTitle}}
 
-{{issue}}
+{{prBody}}
 
-Voici les commentaires associés à l'issue :
-{{comments}}
+Contenu pédagogique actuel du site (src/lib) :
+{{currentContent}}
 
-Respecte strictement le format de sortie JSON demandé.
+Issues déjà ouvertes (ne pas dupliquer) :
+{{openIssues}}
+
+Propose la PROCHAINE petite issue la plus logique : en priorité une matière ou une notion du programme de primaire (avec ses niveaux CP à CM2) qui manque encore au site, pour faire avancer le projet par itérations.

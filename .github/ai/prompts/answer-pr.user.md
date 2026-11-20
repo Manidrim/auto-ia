@@ -1,8 +1,8 @@
-Voici l'issue à analyser :
+PR : {{prTitle}}
 
-{{issue}}
+{{prBody}}
 
-Voici les commentaires associés à l'issue :
+Fil de commentaires :
 {{comments}}
 
-Respecte strictement le format de sortie JSON demandé.
+Réponds à la dernière question du product owner.
