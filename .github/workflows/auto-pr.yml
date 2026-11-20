@@ -8,7 +8,6 @@ permissions:
   contents: write
   pull-requests: write
   issues: write
-  workflows: write
 
 concurrency:
   group: auto-pr-${{ github.event.issue.number }}
