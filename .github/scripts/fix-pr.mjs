@@ -1,85 +1,44 @@
-import { execSync } from "node:child_process";
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
-import { chatJson } from "./mistral.js";
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import { execSync } from 'child_process';
 
-const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
-const prNumber = process.env.PR_NUMBER;
-const token = process.env.GITHUB_TOKEN;
+const configPath = join(process.cwd(), '.github/ai/config.yml');
+const config = JSON.parse(execSync(`node -e "console.log(JSON.stringify(require('js-yaml').load(require('fs').readFileSync('${configPath}', 'utf8'))))"`));
 
-function gh(args) {
-  return execSync(`gh ${args} --repo ${owner}/${repo}`, {
-    env: { ...process.env, GH_TOKEN: token },
-    encoding: "utf8",
-  }).trim();
-}
+const issueNumber = process.env.GITHUB_ISSUE_NUMBER;
+const issue = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
+const comments = issue.comments ? issue.comments.map(c => c.body).join('\n') : '';
 
-function ghApi(endpoint) {
-  return execSync(`gh api ${endpoint}`, {
-    env: { ...process.env, GH_TOKEN: token },
-    encoding: "utf8",
-  }).trim();
-}
+const files = execSync(`git diff --name-only HEAD~1 HEAD`).toString().split('\n').filter(f => f && !config.file_filters.exclude.includes(f));
+const fileContents = files.map(f => ({
+  path: f,
+  content: readFileSync(f, 'utf8')
+}));
 
-const pr = JSON.parse(
-  gh(`pr view ${prNumber} --json title,body,headRefName,baseRefName,state`)
-);
-if (pr.state !== "OPEN") {
-  console.log("PR non ouverte, arrêt.");
-  process.exit(0);
-}
+const systemPrompt = readFileSync('.github/ai/prompts/fix-pr.system.md', 'utf8');
+const userPrompt = readFileSync('.github/ai/prompts/fix-pr.user.md', 'utf8')
+  .replace('{{issue}}', issue.body)
+  .replace('{{files}}', JSON.stringify(fileContents))
+  .replace('{{comments}}', comments);
 
-const comments = JSON.parse(
-  ghApi(`repos/${owner}/${repo}/issues/${prNumber}/comments --paginate`)
-).map((c) => `${c.user.login} : ${c.body}`).join("\n");
+const prompt = `${systemPrompt}\n\n${userPrompt}`;
 
-const reviewComments = JSON.parse(
-  ghApi(`repos/${owner}/${repo}/pulls/${prNumber}/comments --paginate`)
-).map((c) => `${c.user.login} sur ${c.path} : ${c.body}`).join("\n");
-
-execSync(`git checkout ${pr.headRefName}`, { stdio: "inherit" });
-execSync(`git pull origin ${pr.headRefName}`, { stdio: "inherit" });
-
-const repoFiles = execSync("git ls-files", { encoding: "utf8" })
-  .trim()
-  .split("\n")
-  .filter((f) => /\.(jsx?|css|html|json)$/.test(f) && !f.startsWith(".github/scripts"))
-  .join("\n");
-
-const fileContents = {};
-for (const f of repoFiles.split("\n")) {
-  if (existsSync(f) && readFileSync(f, "utf8").length < 8000) {
-    fileContents[f] = readFileSync(f, "utf8");
-  }
-}
-
-const plan = await chatJson([
-  {
-    role: "system",
-    content:
-      "Tu es un développeur React senior. Tu réponds UNIQUEMENT avec un bloc JSON, sans texte autour. " +
-      "Le JSON a la forme : {\"files\": [{\"path\": \"...\", \"content\": \"...\"}], \"summary\": \"...\"}. " +
-      "Chaque file contient le contenu COMPLET du fichier (jamais de diff). " +
-      "Le projet est un site Vite+React pour des élèves de primaire, en français. " +
-      "Les tests utilisent vitest (fichiers *.test.js). Ne casse jamais les tests existants.",
+const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${process.env.MISTRAL_API_KEY}`
   },
-  {
-    role: "user",
-    content:
-      `PR : ${pr.title}\n\n${pr.body}\n\n` +
-      `Retours à appliquer (commentaires) :\n${comments}\n\n` +
-      `Retours sur le code (reviews) :\n${reviewComments}\n\n` +
-      `Fichiers du projet :\n${repoFiles}\n\n` +
-      `Contenus actuels :\n${JSON.stringify(fileContents)}\n\n` +
-      "Applique uniquement les retours demandés, de façon minimale. Rends uniquement le JSON.",
-  },
-]);
+  body: JSON.stringify({
+    model: 'mistral-large-latest',
+    messages: [
+      { role: 'user', content: prompt }
+    ],
+    response_format: { type: 'json_object' }
+  })
+});
 
-for (const file of plan.files) {
-  writeFileSync(file.path, file.content);
-}
+const data = await response.json();
+const result = JSON.parse(data.choices[0].message.content);
 
-execSync("git add -A", { stdio: "inherit" });
-execSync(`git commit -m "fix: retours sur ${prNumber}"`, { stdio: "inherit" });
-execSync(`git push origin ${pr.headRefName}`, { stdio: "inherit" });
-
-console.log(`Retours appliqués sur ${pr.headRefName}.`);
+console.log(JSON.stringify(result));
