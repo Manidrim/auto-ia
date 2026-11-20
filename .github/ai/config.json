@@ -1,0 +1,27 @@
+{
+  "project": {
+    "stack": "Vite+React",
+    "language": "fr",
+    "audience": "élèves de primaire (CP à CM2)",
+    "test_framework": "vitest"
+  },
+  "file_filters": {
+    "extensions": [".jsx", ".js", ".css", ".html", ".json"],
+    "exclude": [".github/"],
+    "max_file_size": 8000
+  },
+  "labels": {
+    "validated": "validated",
+    "enhancement": "enhancement"
+  },
+  "branch": {
+    "prefix": "auto/pr-issue",
+    "bot_name": "auto-ia-bot",
+    "bot_email": "actions@github.com"
+  },
+  "commands": {
+    "question": "/question",
+    "fix": "/corrige"
+  },
+  "issue_format": "user_story"
+}

@@ -2,6 +2,9 @@ import { execSync } from "node:child_process";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { chatJson } from "./mistral.js";
+import { loadConfig, loadPrompt } from "./prompts.js";
+
+const config = loadConfig();
 
 const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
 const issueNumber = process.env.ISSUE_NUMBER;
@@ -33,7 +36,7 @@ execSync(`git checkout -B ${branch} origin/main`, { stdio: "inherit" });
 const repoFiles = execSync("git ls-files", { encoding: "utf8" })
   .trim()
   .split("\n")
-  .filter((f) => /\.(jsx?|css|html|json)$/.test(f) && !f.startsWith(".github/scripts"))
+  .filter((f) => /\.(jsx?|css|html|json)$/.test(f) && !f.startsWith(".github/"))
   .join("\n");
 
 const fileContents = {};
@@ -45,28 +48,19 @@ for (const f of repoFiles.split("\n")) {
 
 const systemMessage = {
   role: "system",
-  content:
-    "Tu es un développeur React senior. Tu réponds UNIQUEMENT avec un seul objet JSON valide : " +
-    "aucune balise markdown, aucun texte avant ou après, aucune explication. " +
-    "Cet objet a exactement deux clés : \"files\" (tableau d'objets ayant chacun \"path\" et \"content\") " +
-    "et \"summary\" (courte description des modifications en français). " +
-    "Chaque \"path\" doit être un chemin relatif d'un fichier existant du projet (voir la liste fournie) " +
-    "ou d'un nouveau fichier à créer sous src/. NE recopie aucun exemple, ne mets jamais de valeur fictive. " +
-    "Ne modifie JAMAIS les fichiers sous .github/workflows/ (le token utilisé n'a pas la permission workflows, le push serait rejeté) : " +
-    "si l'issue porte sur les workflows, déplace la logique dans .github/scripts/ sans toucher aux fichiers .yml. " +
-    "Chaque \"content\" contient le contenu COMPLET du fichier (jamais un diff). " +
-    "Le projet est un site Vite+React pour des élèves de primaire, en français. " +
-    "Les tests utilisent vitest (fichiers *.test.js). Ne casse jamais les tests existants.",
+  content: loadPrompt("generate-pr.system", { "project.audience": config.project.audience }),
 };
 
 const userMessage = {
   role: "user",
-  content:
-    `Fichiers du projet :\n${repoFiles}\n\n` +
-    `Contenus actuels :\n${JSON.stringify(fileContents)}\n\n` +
-    `Issue à implémenter :\n# ${issue.title}\n\n${issue.body}\n\n` +
-    `Commentaires (précisions du product owner) :\n${issue.comments.map((c) => `${c.author.login} : ${c.body}`).join("\n")}\n\n` +
-    "Implémente cette issue de façon minimale et propre. Réponds uniquement avec l'objet JSON demandé.",
+  content: loadPrompt("generate-pr.user", {
+    repoFiles,
+    fileContents: JSON.stringify(fileContents),
+    issueNumber,
+    issueTitle: issue.title,
+    issueBody: issue.body,
+    comments: issue.comments.map((c) => `${c.author.login} : ${c.body}`).join("\n"),
+  }),
 };
 
 function validatePlan(plan) {
