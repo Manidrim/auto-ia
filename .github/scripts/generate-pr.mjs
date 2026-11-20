@@ -52,6 +52,8 @@ const systemMessage = {
     "et \"summary\" (courte description des modifications en français). " +
     "Chaque \"path\" doit être un chemin relatif d'un fichier existant du projet (voir la liste fournie) " +
     "ou d'un nouveau fichier à créer sous src/. NE recopie aucun exemple, ne mets jamais de valeur fictive. " +
+    "Ne modifie JAMAIS les fichiers sous .github/workflows/ (le token utilisé n'a pas la permission workflows, le push serait rejeté) : " +
+    "si l'issue porte sur les workflows, déplace la logique dans .github/scripts/ sans toucher aux fichiers .yml. " +
     "Chaque \"content\" contient le contenu COMPLET du fichier (jamais un diff). " +
     "Le projet est un site Vite+React pour des élèves de primaire, en français. " +
     "Les tests utilisent vitest (fichiers *.test.js). Ne casse jamais les tests existants.",
@@ -70,6 +72,14 @@ const userMessage = {
 function validatePlan(plan) {
   if (!plan || typeof plan !== "object" || !Array.isArray(plan.files) || plan.files.length === 0) {
     throw new Error('Le JSON reçu doit contenir un tableau "files" non vide');
+  }
+  const before = plan.files.length;
+  plan.files = plan.files.filter((f) => !(f && typeof f.path === "string" && f.path.startsWith(".github/workflows/")));
+  if (plan.files.length < before) {
+    console.log(`${before - plan.files.length} fichier(s) .github/workflows/ retiré(s) du plan (permission workflows manquante)`);
+  }
+  if (plan.files.length === 0) {
+    throw new Error('Le plan ne contient que des fichiers .github/workflows/, interdits (permission manquante)');
   }
   for (const file of plan.files) {
     if (!file || typeof file.path !== "string" || typeof file.content !== "string") {
