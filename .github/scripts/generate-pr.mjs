@@ -83,6 +83,10 @@ function validatePlan(plan) {
       throw new Error(`Chemin de fichier invalide : ${JSON.stringify(file.path)}`);
     }
   }
+  const changed = plan.files.filter((f) => fileContents[f.path] !== f.content);
+  if (changed.length === 0) {
+    throw new Error("Aucun fichier ne serait réellement modifié (contenus identiques aux fichiers actuels)");
+  }
   return plan;
 }
 
@@ -112,6 +116,11 @@ for (const file of plan.files) {
 }
 
 execSync("git add -A", { stdio: "inherit" });
+const dirty = execSync("git status --porcelain", { encoding: "utf8" }).trim();
+if (!dirty) {
+  console.log("Aucun changement à committer, aucune PR créée.");
+  process.exit(0);
+}
 execSync(`git commit -m "feat: ${issue.title.replace(/"/g, "'")}"`, { stdio: "inherit" });
 execSync(`git push origin ${branch} --force`, { stdio: "inherit" });
 
