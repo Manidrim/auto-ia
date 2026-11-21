@@ -24,8 +24,16 @@ Site Vite + React pour des élèves de primaire (CP à CM2) : exercices dans les
 npm install
 npm run dev
 npm test
+npm run lint
 npm run build
 ```
+
+## Architecture (hexagonale light)
+
+- `src/domain/` — cœur métier **pur** (aucun import React/DOM/localStorage) : `niveau.js`, `matiere.js` (registre des matières), `exercice.js`, `random.js`, `content/` (données pédagogiques). Le générateur de hasard est injecté (`rand`), ce qui rend les tests déterministes.
+- `src/application/` — cas d'usage : `quizSession.js` (session, scoring), `ports.js` (contrat `ProgressRepository`).
+- `src/infrastructure/` — adaptateurs : `rng.js` (rand seedable), `localStorageProgress.js` (implémente le port).
+- `src/ui/` — adaptateur pilotant (React) : `App.jsx`, `components/Quiz.jsx`.
 
 ## Configuration requise
 

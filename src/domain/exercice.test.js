@@ -7,10 +7,11 @@ import {
   PERIODES,
   DATES,
   EVENEMENTS,
-  makeExercise,
-  randomInt,
-  NIVEAUX,
-} from "./exercises";
+} from "./matiere";
+import { NIVEAUX } from "./niveau";
+import { makeExercise } from "./exercice";
+import { randomInt } from "./random";
+import { createRand } from "../infrastructure/rng";
 
 describe("randomInt", () => {
   it("reste dans les bornes", () => {
@@ -128,9 +129,15 @@ describe("makeExercise", () => {
     });
   });
 
-  it("rejette un mode non autorisé pour une classe", () => {
+  it("rejette une matière non autorisée pour un niveau", () => {
     expect(() => makeExercise(MULTIPLICATIONS, NIVEAUX.CP)).toThrow();
     expect(() => makeExercise(DIVISIONS, NIVEAUX.CE1)).toThrow();
+  });
+
+  it("est déterministe avec un rand seedé", () => {
+    const a = makeExercise(ADDITIONS, NIVEAUX.CE2, createRand(42));
+    const b = makeExercise(ADDITIONS, NIVEAUX.CE2, createRand(42));
+    expect(a).toEqual(b);
   });
 });
 
