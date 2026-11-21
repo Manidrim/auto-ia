@@ -3,7 +3,10 @@ import { extractJson } from "./mistral.js";
 
 describe("extractJson", () => {
   it("parse un JSON brut", () => {
-    expect(extractJson('{"title": "a", "body": "b"}')).toEqual({ title: "a", body: "b" });
+    expect(extractJson('{"title": "a", "body": "b"}')).toEqual({
+      title: "a",
+      body: "b",
+    });
   });
 
   it("parse un bloc ```json", () => {
@@ -26,7 +29,9 @@ describe("extractJson", () => {
   });
 
   it("gère le double encodage (chaîne JSON contenant du JSON échappé)", () => {
-    const inner = JSON.stringify({ files: [{ path: "a.js", content: "const x = 1;\n" }] });
+    const inner = JSON.stringify({
+      files: [{ path: "a.js", content: "const x = 1;\n" }],
+    });
     expect(extractJson(JSON.stringify(inner))).toEqual({
       files: [{ path: "a.js", content: "const x = 1;\n" }],
     });
@@ -43,6 +48,8 @@ describe("extractJson", () => {
   });
 
   it("lève une erreur quand il n'y a aucun JSON", () => {
-    expect(() => extractJson("```bash\nnpm install\nnpm test\n```")).toThrow(/Pas de JSON valide/);
+    expect(() => extractJson("```bash\nnpm install\nnpm test\n```")).toThrow(
+      /Pas de JSON valide/,
+    );
   });
 });

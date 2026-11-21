@@ -2,7 +2,15 @@ import { request } from "https";
 
 const API_URL = "https://api.mistral.ai/v1/chat/completions";
 
-export function chat(messages, { model = "mistral-small-latest", maxTokens = 16384, temperature = 0.2, responseFormat } = {}) {
+export function chat(
+  messages,
+  {
+    model = "mistral-small-latest",
+    maxTokens = 16384,
+    temperature = 0.2,
+    responseFormat,
+  } = {},
+) {
   const apiKey = process.env.MISTRAL_API_KEY;
   if (!apiKey) throw new Error("MISTRAL_API_KEY manquant");
 
@@ -36,7 +44,11 @@ export function chat(messages, { model = "mistral-small-latest", maxTokens = 163
             const json = JSON.parse(data);
             const choice = json.choices[0];
             if (choice.finish_reason === "length") {
-              reject(new Error("Réponse Mistral tronquée (limite max_tokens atteinte) : augmente maxTokens ou réduis la taille de la sortie demandée."));
+              reject(
+                new Error(
+                  "Réponse Mistral tronquée (limite max_tokens atteinte) : augmente maxTokens ou réduis la taille de la sortie demandée.",
+                ),
+              );
               return;
             }
             resolve(choice.message.content);
@@ -44,7 +56,7 @@ export function chat(messages, { model = "mistral-small-latest", maxTokens = 163
             reject(err);
           }
         });
-      }
+      },
     );
     req.on("error", reject);
     req.write(body);
@@ -85,7 +97,9 @@ function jsonCandidates(raw) {
 
   push(raw);
 
-  const fencedBlocks = [...raw.matchAll(/```[a-zA-Z]*\s*([\s\S]*?)```/g)].map((m) => m[1]);
+  const fencedBlocks = [...raw.matchAll(/```[a-zA-Z]*\s*([\s\S]*?)```/g)].map(
+    (m) => m[1],
+  );
   for (const block of fencedBlocks) push(block);
 
   try {
@@ -99,6 +113,7 @@ function jsonCandidates(raw) {
     .replace(/\\r/g, "\r")
     .replace(/\\t/g, "\t")
     .replace(/\\"/g, '"')
+    // eslint-disable-next-line no-control-regex -- \u0000 = marqueur temporaire pour les backslashes échappés
     .replace(/\u0000/g, "\\");
   push(unescaped);
 
@@ -113,7 +128,7 @@ export function extractJson(text) {
     } catch {}
   }
   throw new Error(
-    `Pas de JSON valide dans la réponse (début reçu : ${JSON.stringify(text.slice(0, 200))})`
+    `Pas de JSON valide dans la réponse (début reçu : ${JSON.stringify(text.slice(0, 200))})`,
   );
 }
 
@@ -121,7 +136,10 @@ export async function chatJson(messages, { attempts = 3, ...options } = {}) {
   let lastError;
   for (let attempt = 1; attempt <= attempts; attempt++) {
     try {
-      const response = await chat(messages, { ...options, responseFormat: "json_object" });
+      const response = await chat(messages, {
+        ...options,
+        responseFormat: "json_object",
+      });
       return extractJson(response);
     } catch (err) {
       lastError = err;
