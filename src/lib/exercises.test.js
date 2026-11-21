@@ -9,7 +9,7 @@ import {
   EVENEMENTS,
   makeExercise,
   randomInt,
-  CLASSES,
+  NIVEAUX,
 } from "./exercises";
 
 describe("randomInt", () => {
@@ -25,14 +25,14 @@ describe("randomInt", () => {
 describe("makeExercise", () => {
   describe("CP", () => {
     it("autorise uniquement additions et soustractions", () => {
-      expect(() => makeExercise(MULTIPLICATIONS, CLASSES.CP)).toThrow();
-      expect(() => makeExercise(DIVISIONS, CLASSES.CP)).toThrow();
-      expect(() => makeExercise(ADDITIONS, CLASSES.CP)).not.toThrow();
-      expect(() => makeExercise(SOUSTRACTIONS, CLASSES.CP)).not.toThrow();
+      expect(() => makeExercise(MULTIPLICATIONS, NIVEAUX.CP)).toThrow();
+      expect(() => makeExercise(DIVISIONS, NIVEAUX.CP)).toThrow();
+      expect(() => makeExercise(ADDITIONS, NIVEAUX.CP)).not.toThrow();
+      expect(() => makeExercise(SOUSTRACTIONS, NIVEAUX.CP)).not.toThrow();
     });
 
     it("génère une addition correcte avec nombres jusqu'à 100", () => {
-      const ex = makeExercise(ADDITIONS, CLASSES.CP);
+      const ex = makeExercise(ADDITIONS, NIVEAUX.CP);
       const [a, b] = ex.question.split(" + ").map(Number);
       expect(ex.answer).toBe(a + b);
       expect(a).toBeGreaterThanOrEqual(1);
@@ -42,7 +42,7 @@ describe("makeExercise", () => {
     });
 
     it("génère une soustraction avec un résultat positif", () => {
-      const ex = makeExercise(SOUSTRACTIONS, CLASSES.CP);
+      const ex = makeExercise(SOUSTRACTIONS, NIVEAUX.CP);
       const [a, b] = ex.question.split(" - ").map(Number);
       expect(ex.answer).toBe(a - b);
       expect(ex.answer).toBeGreaterThanOrEqual(0);
@@ -55,14 +55,14 @@ describe("makeExercise", () => {
 
   describe("CE1", () => {
     it("autorise additions, soustractions et multiplications", () => {
-      expect(() => makeExercise(ADDITIONS, CLASSES.CE1)).not.toThrow();
-      expect(() => makeExercise(SOUSTRACTIONS, CLASSES.CE1)).not.toThrow();
-      expect(() => makeExercise(MULTIPLICATIONS, CLASSES.CE1)).not.toThrow();
-      expect(() => makeExercise(DIVISIONS, CLASSES.CE1)).toThrow();
+      expect(() => makeExercise(ADDITIONS, NIVEAUX.CE1)).not.toThrow();
+      expect(() => makeExercise(SOUSTRACTIONS, NIVEAUX.CE1)).not.toThrow();
+      expect(() => makeExercise(MULTIPLICATIONS, NIVEAUX.CE1)).not.toThrow();
+      expect(() => makeExercise(DIVISIONS, NIVEAUX.CE1)).toThrow();
     });
 
     it("génère une multiplication avec tables de 1 à 10", () => {
-      const ex = makeExercise(MULTIPLICATIONS, CLASSES.CE1);
+      const ex = makeExercise(MULTIPLICATIONS, NIVEAUX.CE1);
       const [a, b] = ex.question.split(" × ").map(Number);
       expect(ex.answer).toBe(a * b);
       expect(b).toBeGreaterThanOrEqual(1);
@@ -74,14 +74,14 @@ describe("makeExercise", () => {
 
   describe("CE2", () => {
     it("autorise toutes les opérations", () => {
-      expect(() => makeExercise(ADDITIONS, CLASSES.CE2)).not.toThrow();
-      expect(() => makeExercise(SOUSTRACTIONS, CLASSES.CE2)).not.toThrow();
-      expect(() => makeExercise(MULTIPLICATIONS, CLASSES.CE2)).not.toThrow();
-      expect(() => makeExercise(DIVISIONS, CLASSES.CE2)).not.toThrow();
+      expect(() => makeExercise(ADDITIONS, NIVEAUX.CE2)).not.toThrow();
+      expect(() => makeExercise(SOUSTRACTIONS, NIVEAUX.CE2)).not.toThrow();
+      expect(() => makeExercise(MULTIPLICATIONS, NIVEAUX.CE2)).not.toThrow();
+      expect(() => makeExercise(DIVISIONS, NIVEAUX.CE2)).not.toThrow();
     });
 
     it("génère une division simple", () => {
-      const ex = makeExercise(DIVISIONS, CLASSES.CE2);
+      const ex = makeExercise(DIVISIONS, NIVEAUX.CE2);
       const [a, b] = ex.question.split(" ÷ ").map(Number);
       expect(ex.answer).toBe(a / b);
       expect(Number.isInteger(ex.answer)).toBe(true);
@@ -94,14 +94,14 @@ describe("makeExercise", () => {
 
   describe("CM1", () => {
     it("autorise toutes les opérations avec nombres jusqu'à 10000", () => {
-      const exAdd = makeExercise(ADDITIONS, CLASSES.CM1);
+      const exAdd = makeExercise(ADDITIONS, NIVEAUX.CM1);
       const [aAdd, bAdd] = exAdd.question.split(" + ").map(Number);
       expect(aAdd).toBeGreaterThanOrEqual(1);
       expect(aAdd).toBeLessThanOrEqual(10000);
       expect(bAdd).toBeGreaterThanOrEqual(1);
       expect(bAdd).toBeLessThanOrEqual(10000);
 
-      const exMul = makeExercise(MULTIPLICATIONS, CLASSES.CM1);
+      const exMul = makeExercise(MULTIPLICATIONS, NIVEAUX.CM1);
       const [aMul, bMul] = exMul.question.split(" × ").map(Number);
       expect(aMul).toBeGreaterThanOrEqual(1);
       expect(aMul).toBeLessThanOrEqual(10000);
@@ -112,14 +112,14 @@ describe("makeExercise", () => {
 
   describe("CM2", () => {
     it("autorise toutes les opérations avec grands nombres", () => {
-      const exAdd = makeExercise(ADDITIONS, CLASSES.CM2);
+      const exAdd = makeExercise(ADDITIONS, NIVEAUX.CM2);
       const [aAdd, bAdd] = exAdd.question.split(" + ").map(Number);
       expect(aAdd).toBeGreaterThanOrEqual(1);
       expect(aAdd).toBeLessThanOrEqual(1000000);
       expect(bAdd).toBeGreaterThanOrEqual(1);
       expect(bAdd).toBeLessThanOrEqual(1000000);
 
-      const exDiv = makeExercise(DIVISIONS, CLASSES.CM2);
+      const exDiv = makeExercise(DIVISIONS, NIVEAUX.CM2);
       const [aDiv, bDiv] = exDiv.question.split(" ÷ ").map(Number);
       expect(aDiv).toBeGreaterThanOrEqual(1);
       expect(aDiv).toBeLessThanOrEqual(1000000);
@@ -129,23 +129,23 @@ describe("makeExercise", () => {
   });
 
   it("rejette un mode non autorisé pour une classe", () => {
-    expect(() => makeExercise(MULTIPLICATIONS, CLASSES.CP)).toThrow();
-    expect(() => makeExercise(DIVISIONS, CLASSES.CE1)).toThrow();
+    expect(() => makeExercise(MULTIPLICATIONS, NIVEAUX.CP)).toThrow();
+    expect(() => makeExercise(DIVISIONS, NIVEAUX.CE1)).toThrow();
   });
 });
 
 describe("Histoire", () => {
   it("autorise les périodes dès le CP, les dates à partir du CE1, les événements à partir du CE2", () => {
-    expect(() => makeExercise(PERIODES, CLASSES.CP)).not.toThrow();
-    expect(() => makeExercise(DATES, CLASSES.CP)).toThrow();
-    expect(() => makeExercise(EVENEMENTS, CLASSES.CE1)).toThrow();
-    expect(() => makeExercise(DATES, CLASSES.CE1)).not.toThrow();
-    expect(() => makeExercise(EVENEMENTS, CLASSES.CE2)).not.toThrow();
-    expect(() => makeExercise(EVENEMENTS, CLASSES.CM2)).not.toThrow();
+    expect(() => makeExercise(PERIODES, NIVEAUX.CP)).not.toThrow();
+    expect(() => makeExercise(DATES, NIVEAUX.CP)).toThrow();
+    expect(() => makeExercise(EVENEMENTS, NIVEAUX.CE1)).toThrow();
+    expect(() => makeExercise(DATES, NIVEAUX.CE1)).not.toThrow();
+    expect(() => makeExercise(EVENEMENTS, NIVEAUX.CE2)).not.toThrow();
+    expect(() => makeExercise(EVENEMENTS, NIVEAUX.CM2)).not.toThrow();
   });
 
   it("génère une question et une réponse textuelles", () => {
-    const ex = makeExercise(PERIODES, CLASSES.CE2);
+    const ex = makeExercise(PERIODES, NIVEAUX.CE2);
     expect(typeof ex.question).toBe("string");
     expect(typeof ex.answer).toBe("string");
     expect(ex.question.length).toBeGreaterThan(0);

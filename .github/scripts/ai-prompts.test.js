@@ -27,7 +27,11 @@ describe("prompts IA (.github/ai)", () => {
   });
 
   it("loadPrompt remplace les variables {{...}}", () => {
-    const out = loadPrompt("answer-pr.user", { prTitle: "Mon titre", prBody: "B", comments: "C" });
+    const out = loadPrompt("answer-pr.user", {
+      prTitle: "Mon titre",
+      prBody: "B",
+      comments: "C",
+    });
     expect(out).toContain("Mon titre");
     expect(out).not.toContain("{{prTitle}}");
   });
