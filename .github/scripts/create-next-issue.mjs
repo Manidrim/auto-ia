@@ -1,5 +1,12 @@
 import { execSync } from "node:child_process";
-import { readFileSync, writeFileSync, readdirSync, existsSync } from "node:fs";
+import {
+  readFileSync,
+  writeFileSync,
+  readdirSync,
+  existsSync,
+  statSync,
+} from "node:fs";
+import { join } from "node:path";
 import { chatJson } from "./mistral.js";
 import { loadPrompt } from "./prompts.js";
 import { makeGh } from "./lib/gh.js";
@@ -14,16 +21,27 @@ const openIssues = JSON.parse(
   gh("issue list --state open --json number,title --limit 50"),
 );
 
-let currentContent = "(aucun fichier src/lib trouvé)";
-const libDir = "src/lib";
-if (existsSync(libDir)) {
-  const parts = [];
-  for (const f of readdirSync(libDir)) {
-    if (/\.jsx?$/.test(f)) {
-      const path = `${libDir}/${f}`;
-      const content = readFileSync(path, "utf8");
-      if (content.length < 4000) parts.push(`--- ${path} ---\n${content}`);
+function collectJsFiles(dir) {
+  if (!existsSync(dir)) return [];
+  const out = [];
+  for (const entry of readdirSync(dir)) {
+    const path = join(dir, entry);
+    if (statSync(path).isDirectory()) {
+      out.push(...collectJsFiles(path));
+    } else if (/\.jsx?$/.test(entry)) {
+      out.push(path);
     }
+  }
+  return out;
+}
+
+let currentContent = "(aucun fichier src/ trouvé)";
+const srcFiles = collectJsFiles("src");
+if (srcFiles.length > 0) {
+  const parts = [];
+  for (const path of srcFiles) {
+    const content = readFileSync(path, "utf8");
+    if (content.length < 4000) parts.push(`--- ${path} ---\n${content}`);
   }
   if (parts.length > 0) currentContent = parts.join("\n\n");
 }
