@@ -35,7 +35,10 @@ export default function Quiz({ mode, classe, onExit }) {
   function submit(e) {
     e.preventDefault();
     if (feedback !== null) return;
-    const ok = Number(value) === exercise.answer;
+    const ok =
+      typeof exercise.answer === "number"
+        ? Number(value) === exercise.answer
+        : value.trim() === String(exercise.answer);
     setFeedback(ok);
     setShowFeedback(true);
     setHasAnswered(true);
@@ -102,8 +105,8 @@ export default function Quiz({ mode, classe, onExit }) {
         <form onSubmit={submit}>
           <input
             autoFocus
-            type="number"
-            inputMode="numeric"
+            type={typeof exercise.answer === "number" ? "number" : "text"}
+            inputMode={typeof exercise.answer === "number" ? "numeric" : "text"}
             value={value}
             onChange={(e) => setValue(e.target.value)}
             aria-label="Ta réponse"

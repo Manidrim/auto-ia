@@ -4,6 +4,9 @@ import {
   SOUSTRACTIONS,
   MULTIPLICATIONS,
   DIVISIONS,
+  PERIODES,
+  DATES,
+  EVENEMENTS,
   makeExercise,
   randomInt,
   CLASSES,
@@ -128,5 +131,24 @@ describe("makeExercise", () => {
   it("rejette un mode non autorisé pour une classe", () => {
     expect(() => makeExercise(MULTIPLICATIONS, CLASSES.CP)).toThrow();
     expect(() => makeExercise(DIVISIONS, CLASSES.CE1)).toThrow();
+  });
+});
+
+describe("Histoire", () => {
+  it("autorise les périodes dès le CP, les dates à partir du CE1, les événements à partir du CE2", () => {
+    expect(() => makeExercise(PERIODES, CLASSES.CP)).not.toThrow();
+    expect(() => makeExercise(DATES, CLASSES.CP)).toThrow();
+    expect(() => makeExercise(EVENEMENTS, CLASSES.CE1)).toThrow();
+    expect(() => makeExercise(DATES, CLASSES.CE1)).not.toThrow();
+    expect(() => makeExercise(EVENEMENTS, CLASSES.CE2)).not.toThrow();
+    expect(() => makeExercise(EVENEMENTS, CLASSES.CM2)).not.toThrow();
+  });
+
+  it("génère une question et une réponse textuelles", () => {
+    const ex = makeExercise(PERIODES, CLASSES.CE2);
+    expect(typeof ex.question).toBe("string");
+    expect(typeof ex.answer).toBe("string");
+    expect(ex.question.length).toBeGreaterThan(0);
+    expect(ex.answer.length).toBeGreaterThan(0);
   });
 });
