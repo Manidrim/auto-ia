@@ -12,12 +12,14 @@ import { createLocalStorageProgress } from "../../infrastructure/localStoragePro
 const CONFIRMATION_MESSAGE =
   "Toutes tes réponses seront perdues. Es-tu sûr de vouloir annuler ?";
 
+const defaultProgress = createLocalStorageProgress();
+
 export default function Quiz({
   matiere,
   niveau,
   onExit,
   rand = Math.random,
-  progress = createLocalStorageProgress(),
+  progress = defaultProgress,
 }) {
   const [session, setSession] = useState(() =>
     createSession({ matiere, niveau, rand, points: progress.getPoints() }),

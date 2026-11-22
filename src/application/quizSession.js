@@ -5,6 +5,7 @@ export const POINTS_CORRECT = 10;
 export const POINTS_INCORRECT = -5;
 
 export function isCorrect(exercise, value) {
+  if (typeof value === "string" && value.trim() === "") return false;
   return typeof exercise.answer === "number"
     ? Number(value) === exercise.answer
     : value.trim() === String(exercise.answer);
