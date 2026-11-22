@@ -12,7 +12,13 @@ const prNumber = process.env.PR_NUMBER;
 const { gh, ghApi } = makeGh({ owner, repo, token: process.env.GITHUB_TOKEN });
 
 const pr = JSON.parse(
-  gh(`pr view ${prNumber} --json title,body,headRefName,baseRefName,state`),
+  gh(
+    "pr",
+    "view",
+    prNumber,
+    "--json",
+    "title,body,headRefName,baseRefName,state",
+  ),
 );
 if (pr.state !== "OPEN") {
   console.log("PR non ouverte, arrêt.");
@@ -20,13 +26,13 @@ if (pr.state !== "OPEN") {
 }
 
 const comments = JSON.parse(
-  ghApi(`repos/${owner}/${repo}/issues/${prNumber}/comments --paginate`),
+  ghApi(`repos/${owner}/${repo}/issues/${prNumber}/comments`, "--paginate"),
 )
   .map((c) => `${c.user.login} : ${c.body}`)
   .join("\n");
 
 const reviewComments = JSON.parse(
-  ghApi(`repos/${owner}/${repo}/pulls/${prNumber}/comments --paginate`),
+  ghApi(`repos/${owner}/${repo}/pulls/${prNumber}/comments`, "--paginate"),
 )
   .map((c) => `${c.user.login} sur ${c.path} : ${c.body}`)
   .join("\n");

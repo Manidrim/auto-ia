@@ -14,21 +14,21 @@ export function validatePlan(plan, fileContents) {
     throw new Error('Le JSON reçu doit contenir un tableau "files" non vide');
   }
   const before = plan.files.length;
-  plan.files = plan.files.filter(
+  const files = plan.files.filter(
     (f) =>
       !(f && typeof f.path === "string" && f.path.startsWith(FORBIDDEN_PREFIX)),
   );
-  if (plan.files.length < before) {
+  if (files.length < before) {
     console.log(
-      `${before - plan.files.length} fichier(s) ${FORBIDDEN_PREFIX} retiré(s) du plan (permission workflows manquante)`,
+      `${before - files.length} fichier(s) ${FORBIDDEN_PREFIX} retirés du plan (permission workflows manquante)`,
     );
   }
-  if (plan.files.length === 0) {
+  if (files.length === 0) {
     throw new Error(
       `Le plan ne contient que des fichiers ${FORBIDDEN_PREFIX}, interdits (permission manquante)`,
     );
   }
-  for (const file of plan.files) {
+  for (const file of files) {
     if (
       !file ||
       typeof file.path !== "string" ||
@@ -48,13 +48,13 @@ export function validatePlan(plan, fileContents) {
       );
     }
   }
-  const changed = plan.files.filter((f) => fileContents[f.path] !== f.content);
+  const changed = files.filter((f) => fileContents[f.path] !== f.content);
   if (changed.length === 0) {
     throw new Error(
       "Aucun fichier ne serait réellement modifié (contenus identiques aux fichiers actuels)",
     );
   }
-  return plan;
+  return { ...plan, files };
 }
 
 export async function obtainPlan(
