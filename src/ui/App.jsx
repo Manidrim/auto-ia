@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Quiz from "./components/Quiz";
-import { MATIERES, NIVEAUX } from "./lib/exercises";
+import { MATIERES } from "../domain/matiere";
+import { NIVEAUX_LIST } from "../domain/niveau";
 
 export default function App() {
   const [niveau, setNiveau] = useState(null);
@@ -12,7 +13,7 @@ export default function App() {
         <h1>🧮 Auto-Maths</h1>
         <p>Choisis ton niveau !</p>
         <ul>
-          {Object.values(NIVEAUX).map((n) => (
+          {NIVEAUX_LIST.map((n) => (
             <li key={n.label}>
               <button onClick={() => setNiveau(n)}>{n.label}</button>
             </li>
