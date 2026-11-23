@@ -14,7 +14,6 @@ Projet qui **s'auto-alimente** : l'IA propose, tu valides, l'IA code, la CI vér
 5. La **CI** ([`ci.yml`](.github/workflows/ci.yml)) fait tourner les tests vitest et le build Vite sur la PR.
 6. Tu merges la PR → le workflow [`next-issue.yml`](.github/workflows/next-issue.yml) demande à l'IA de créer la **prochaine issue**.
 
-
 ## Le site
 
 Site Vite + React pour des élèves de primaire (CP à CM2) : exercices dans les matières du programme scolaire — français, maths, histoire, géographie, sciences, anglais, EMC — avec score et feedback immédiat.
@@ -35,7 +34,7 @@ npm run build
 
 ## Labels
 
-| Label | Rôle |
-|---|---|
-| `validated` | Déclenche la génération automatique de la PR |
-| `enhancement` | Issue de nouvelle fonctionnalité |
+| Label         | Rôle                                         |
+| ------------- | -------------------------------------------- |
+| `validated`   | Déclenche la génération automatique de la PR |
+| `enhancement` | Issue de nouvelle fonctionnalité             |

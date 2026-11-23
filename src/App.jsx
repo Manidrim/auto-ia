@@ -1,20 +1,20 @@
 import { useState } from "react";
 import Quiz from "./components/Quiz";
-import { LEVELS, CLASSES } from "./lib/exercises";
+import { MATIERES, NIVEAUX } from "./lib/exercises";
 
 export default function App() {
-  const [classe, setClasse] = useState(null);
-  const [mode, setMode] = useState(null);
+  const [niveau, setNiveau] = useState(null);
+  const [matiere, setMatiere] = useState(null);
 
-  if (classe === null) {
+  if (niveau === null) {
     return (
       <main className="menu">
         <h1>🧮 Auto-Maths</h1>
         <p>Choisis ton niveau !</p>
         <ul>
-          {Object.values(CLASSES).map((c) => (
-            <li key={c.label}>
-              <button onClick={() => setClasse(c)}>{c.label}</button>
+          {Object.values(NIVEAUX).map((n) => (
+            <li key={n.label}>
+              <button onClick={() => setNiveau(n)}>{n.label}</button>
             </li>
           ))}
         </ul>
@@ -22,22 +22,22 @@ export default function App() {
     );
   }
 
-  if (mode === null) {
+  if (matiere === null) {
     return (
       <main className="menu">
         <h1>🧮 Auto-Maths</h1>
         <p>
-          Niveau : <strong>{classe.label}</strong>
+          Niveau : <strong>{niveau.label}</strong>
         </p>
         <p>Choisis ta matière</p>
         <ul>
-          {classe.allowedModes.map((m) => (
+          {niveau.matieres.map((m) => (
             <li key={m}>
-              <button onClick={() => setMode(m)}>{LEVELS[m].label}</button>
+              <button onClick={() => setMatiere(m)}>{MATIERES[m].label}</button>
             </li>
           ))}
         </ul>
-        <button onClick={() => setClasse(null)} style={{ marginTop: "1rem" }}>
+        <button onClick={() => setNiveau(null)} style={{ marginTop: "1rem" }}>
           Changer de niveau
         </button>
       </main>
@@ -46,7 +46,7 @@ export default function App() {
 
   return (
     <main className="menu">
-      <Quiz mode={mode} classe={classe} onExit={() => setMode(null)} />
+      <Quiz matiere={matiere} niveau={niveau} onExit={() => setMatiere(null)} />
     </main>
   );
 }
