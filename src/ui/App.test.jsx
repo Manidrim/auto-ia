@@ -31,6 +31,9 @@ describe("App — parcours niveau → matière → quiz", () => {
       screen.getByRole("button", { name: "Événements historiques" }),
     ).toBeInTheDocument();
     expect(
+      screen.getByRole("button", { name: "Caractéristiques des périodes" }),
+    ).toBeInTheDocument();
+    expect(
       screen.getByRole("button", { name: "Additions" }),
     ).toBeInTheDocument();
   });

@@ -3,6 +3,7 @@ import {
   PERIODES,
   DATES,
   EVENEMENTS,
+  CARACTERISTIQUES,
   HISTORY_MATIERES,
   makeHistoryExercise,
 } from "./content/histoire.js";
@@ -12,7 +13,7 @@ export const SOUSTRACTIONS = "soustractions";
 export const MULTIPLICATIONS = "multiplications";
 export const DIVISIONS = "divisions";
 
-export { PERIODES, DATES, EVENEMENTS };
+export { PERIODES, DATES, EVENEMENTS, CARACTERISTIQUES };
 
 export const MATIERES = {
   [ADDITIONS]: {
@@ -63,5 +64,9 @@ export const MATIERES = {
   [EVENEMENTS]: {
     label: HISTORY_MATIERES[EVENEMENTS].label,
     generate: (niveau, rand) => makeHistoryExercise(EVENEMENTS, niveau, rand),
+  },
+  [CARACTERISTIQUES]: {
+    label: HISTORY_MATIERES[CARACTERISTIQUES].label,
+    generate: (niveau, rand) => makeHistoryExercise(CARACTERISTIQUES, niveau, rand),
   },
 };

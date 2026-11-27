@@ -7,6 +7,7 @@ import {
   PERIODES,
   DATES,
   EVENEMENTS,
+  CARACTERISTIQUES,
 } from "./matiere";
 import { NIVEAUX } from "./niveau";
 import { makeExercise } from "./exercice";
@@ -142,17 +143,44 @@ describe("makeExercise", () => {
 });
 
 describe("Histoire", () => {
-  it("autorise les périodes dès le CP, les dates à partir du CE1, les événements à partir du CE2", () => {
+  it("autorise les périodes dès le CP, les dates à partir du CE1, les événements à partir du CE2, les caractéristiques à partir du CE2", () => {
     expect(() => makeExercise(PERIODES, NIVEAUX.CP)).not.toThrow();
     expect(() => makeExercise(DATES, NIVEAUX.CP)).toThrow();
     expect(() => makeExercise(EVENEMENTS, NIVEAUX.CE1)).toThrow();
+    expect(() => makeExercise(CARACTERISTIQUES, NIVEAUX.CE1)).toThrow();
     expect(() => makeExercise(DATES, NIVEAUX.CE1)).not.toThrow();
     expect(() => makeExercise(EVENEMENTS, NIVEAUX.CE2)).not.toThrow();
+    expect(() => makeExercise(CARACTERISTIQUES, NIVEAUX.CE2)).not.toThrow();
     expect(() => makeExercise(EVENEMENTS, NIVEAUX.CM2)).not.toThrow();
+    expect(() => makeExercise(CARACTERISTIQUES, NIVEAUX.CM2)).not.toThrow();
   });
 
-  it("génère une question et une réponse textuelles", () => {
+  it("génère une question et une réponse textuelles pour les périodes", () => {
     const ex = makeExercise(PERIODES, NIVEAUX.CE2);
+    expect(typeof ex.question).toBe("string");
+    expect(typeof ex.answer).toBe("string");
+    expect(ex.question.length).toBeGreaterThan(0);
+    expect(ex.answer.length).toBeGreaterThan(0);
+  });
+
+  it("génère une question et une réponse textuelles pour les dates", () => {
+    const ex = makeExercise(DATES, NIVEAUX.CE2);
+    expect(typeof ex.question).toBe("string");
+    expect(typeof ex.answer).toBe("string");
+    expect(ex.question.length).toBeGreaterThan(0);
+    expect(ex.answer.length).toBeGreaterThan(0);
+  });
+
+  it("génère une question et une réponse textuelles pour les événements", () => {
+    const ex = makeExercise(EVENEMENTS, NIVEAUX.CE2);
+    expect(typeof ex.question).toBe("string");
+    expect(typeof ex.answer).toBe("string");
+    expect(ex.question.length).toBeGreaterThan(0);
+    expect(ex.answer.length).toBeGreaterThan(0);
+  });
+
+  it("génère une question et une réponse textuelles pour les caractéristiques", () => {
+    const ex = makeExercise(CARACTERISTIQUES, NIVEAUX.CE2);
     expect(typeof ex.question).toBe("string");
     expect(typeof ex.answer).toBe("string");
     expect(ex.question.length).toBeGreaterThan(0);

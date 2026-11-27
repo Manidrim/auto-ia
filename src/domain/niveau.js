@@ -6,6 +6,7 @@ import {
   PERIODES,
   DATES,
   EVENEMENTS,
+  CARACTERISTIQUES,
 } from "./matiere.js";
 
 export const NIVEAUX = {
@@ -33,6 +34,7 @@ export const NIVEAUX = {
       PERIODES,
       DATES,
       EVENEMENTS,
+      CARACTERISTIQUES,
     ],
   },
   CM1: {
@@ -47,6 +49,7 @@ export const NIVEAUX = {
       PERIODES,
       DATES,
       EVENEMENTS,
+      CARACTERISTIQUES,
     ],
   },
   CM2: {
@@ -61,6 +64,7 @@ export const NIVEAUX = {
       PERIODES,
       DATES,
       EVENEMENTS,
+      CARACTERISTIQUES,
     ],
   },
 };
